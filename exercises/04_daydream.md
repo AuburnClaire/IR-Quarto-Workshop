@@ -64,4 +64,4 @@ person who will ask "so are we okay?"
 ## Then
 
 Save your file under a new name in `exercises/` so you keep the original.
-At 2:40 we will put a few on the screen.
+At 11:10 we will put a few on the screen.
