@@ -1,0 +1,193 @@
+---
+title: "Program Performance Preview"
+subtitle: "What the Department of Education's 2026 Program Performance Data says about one institution"
+date: today
+date-format: "MMMM D, YYYY"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+params:
+  unitid: 100858
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gt)
+library(scales)
+library(here)
+
+# Everything comes from the tables built by ingest/make_ppd_tables.R.
+programs <- readRDS(here("data", "ppd_programs.rds"))
+yearly   <- readRDS(here("data", "ppd_yearly.rds"))
+
+# One institution, chosen by the unitid parameter at the top of this file.
+inst <- programs %>% filter(unitid == params$unitid)
+if (nrow(inst) == 0) stop("No programs found for unitid ", params$unitid,
+                          ". Look yours up in data/institutions.csv.")
+inst_name <- inst$instnm[1]
+inst_opeid <- inst$opeid6[1]
+
+# Programs that exist now (enrolled Title IV students in 2023-24 or 2024-25).
+current <- inst %>% filter(exists_in_2024_or_2025 == 1)
+tested  <- current %>% filter(earnings_test != "Not tested")
+
+fmt_dollar <- label_dollar(accuracy = 1)
+fmt_n      <- label_comma(accuracy = 1)
+```
+
+# `r inst_name`
+
+::: {.callout-note title="About the data"}
+This report reads the **2026 Program Performance Data (PPD:2026)**, published by
+the U.S. Department of Education in December 2025 for the AHEAD negotiated
+rulemaking and updated January 8, 2026. The Department describes it as a
+preview, for information only. The official results under the Student Tuition
+and Transparency System (STATS) are expected in **February 2027**, at the
+6-digit CIP level. A program here is one combination of institution, credential
+level, and 4-digit CIP. Earnings are for Title IV completers working and not
+enrolled four years after the 2017-18 and 2018-19 cohorts, in 2024 dollars.
+Debt is in 2019 dollars. Counts between 10 and 19 were set to 15 by the
+Department, and smaller counts are suppressed.
+:::
+
+## At a glance
+
+```{r}
+#| label: glance
+tibble(
+  What = c("Programs with Title IV students, 2023-24 or 2024-25",
+           "Title IV enrollment, 2024-25",
+           "Programs with a reportable earnings result",
+           "Programs that pass the earnings test",
+           "Programs that fail the earnings test"),
+  Count = c(nrow(current),
+            sum(current$t4enrl_prg_2025, na.rm = TRUE),
+            nrow(tested),
+            sum(tested$earnings_test == "Pass"),
+            sum(tested$earnings_test == "Fail"))
+) %>%
+  gt() %>%
+  fmt_number(Count, decimals = 0) %>%
+  tab_options(table.width = pct(70), column_labels.hidden = TRUE)
+```
+
+## The earnings test, program by program
+
+Each tested program's median earnings next to the benchmark it was measured
+against. Programs are sorted so the ones closest to failing come first.
+
+```{r}
+#| label: test-table
+tested %>%
+  arrange(earnings_margin) %>%
+  select(credlev, cip4_code, cip4_title, t4enrl_prg_2025,
+         md_earn_wne_p4, earn_bnchmrk_cip2_wageb, earnings_margin, earnings_test) %>%
+  gt(groupname_col = "credlev") %>%
+  cols_label(cip4_code = "CIP", cip4_title = "Program",
+             t4enrl_prg_2025 = "Enrolled 2024-25",
+             md_earn_wne_p4 = "Median earnings",
+             earn_bnchmrk_cip2_wageb = "Benchmark",
+             earnings_margin = "Margin", earnings_test = "Result") %>%
+  fmt_number(t4enrl_prg_2025, decimals = 0) %>%
+  fmt_currency(c(md_earn_wne_p4, earn_bnchmrk_cip2_wageb, earnings_margin), decimals = 0) %>%
+  sub_missing(missing_text = "") %>%
+  tab_style(style = cell_fill(color = "#F8D7DA"),
+            locations = cells_body(rows = earnings_test == "Fail")) %>%
+  tab_options(table.font.size = px(13))
+```
+
+## Margin above the benchmark
+
+```{r}
+#| label: margin-chart
+#| fig-height: 6
+tested %>%
+  mutate(label = paste0(cip4_title, " (", credlev, ")")) %>%
+  ggplot(aes(x = earnings_margin, y = reorder(label, earnings_margin), fill = earnings_test)) +
+  geom_col() +
+  geom_vline(xintercept = 0, colour = "grey30") +
+  scale_x_continuous(labels = label_dollar()) +
+  scale_fill_manual(values = c(Pass = "#0C2340", Fail = "#E87722"), name = NULL) +
+  labs(x = "Median earnings minus benchmark (2024 dollars)", y = NULL,
+       title = "How far each program sits from its earnings benchmark") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "top", axis.text.y = element_text(size = 8))
+```
+
+## Ten years of enrollment
+
+Title IV enrollment by credential level, 2015-16 through 2024-25.
+
+```{r}
+#| label: enrollment-trend
+#| fig-height: 4
+yearly %>%
+  filter(opeid6 == inst_opeid) %>%
+  group_by(award_year, credlev) %>%
+  summarise(enrolled = sum(t4enrl_prg, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(award_year, enrolled, colour = credlev)) +
+  geom_line(linewidth = 1) +
+  geom_point() +
+  scale_x_continuous(breaks = 2016:2025, labels = function(y) paste0(y - 1, "-", substr(y, 3, 4))) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(x = NULL, y = "Title IV students", colour = NULL,
+       title = "Title IV enrollment by credential level") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "top", axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Debt and earnings
+
+```{r}
+#| label: debt-table
+current %>%
+  filter(!is.na(debt_all_stgp_eval_mdn) | !is.na(md_earn_wne_p4)) %>%
+  select(credlev, cip4_title, debt_all_stgp_eval_n, debt_all_stgp_eval_mdn, md_earn_wne_p4) %>%
+  arrange(credlev, desc(debt_all_stgp_eval_mdn)) %>%
+  gt(groupname_col = "credlev") %>%
+  cols_label(cip4_title = "Program", debt_all_stgp_eval_n = "Borrowers",
+             debt_all_stgp_eval_mdn = "Median debt (2019 $)", md_earn_wne_p4 = "Median earnings (2024 $)") %>%
+  fmt_number(debt_all_stgp_eval_n, decimals = 0) %>%
+  fmt_currency(c(debt_all_stgp_eval_mdn, md_earn_wne_p4), decimals = 0) %>%
+  sub_missing(missing_text = "") %>%
+  tab_options(table.font.size = px(13))
+```
+
+::: {.content-visible when-format="html"}
+
+## Every current program
+
+This section appears only in the HTML version. A 245-row table is fine on
+a web page and silly on paper, so the PDF, Word and slide versions skip it.
+Delete the `:::` lines around it if you want it everywhere.
+
+```{r}
+#| label: all-programs
+current %>%
+  select(credlev, cip4_code, cip4_title, t4enrl_prg_2025, t4completers_2025, pell_stu_count_2025, earnings_test) %>%
+  arrange(credlev, cip4_code) %>%
+  gt(groupname_col = "credlev") %>%
+  cols_label(cip4_code = "CIP", cip4_title = "Program", t4enrl_prg_2025 = "Enrolled 2024-25",
+             t4completers_2025 = "Completers 2024-25", pell_stu_count_2025 = "Pell 2024-25",
+             earnings_test = "Earnings test") %>%
+  fmt_number(c(t4enrl_prg_2025, t4completers_2025, pell_stu_count_2025), decimals = 0) %>%
+  sub_missing(missing_text = "") %>%
+  tab_options(table.font.size = px(12))
+```
+
+:::
+
+---
+
+*Source: U.S. Department of Education, 2026 Program Performance Data, AHEAD
+Session 2 materials. Built with Quarto. The code that made every number in
+this report is in the file that rendered it.*

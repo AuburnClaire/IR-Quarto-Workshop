@@ -1,0 +1,143 @@
+---
+title: "Daydream examples"
+subtitle: "Five sections you could add to your report, with the code"
+date: today
+format:
+  html:
+    toc: true
+    embed-resources: true
+    code-fold: true
+    code-summary: "Show the code"
+params:
+  unitid: 100858
+execute:
+  warning: false
+  message: false
+---
+
+Each section below is one answer to a question in `exercises/04_daydream.md`.
+The code is folded; click "Show the code". Copy a section into your own
+report and change it.
+
+```{r}
+#| label: setup
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gt)
+library(scales)
+library(readr)
+library(here)
+
+programs <- readRDS(here("data", "ppd_programs.rds"))
+yearly   <- readRDS(here("data", "ppd_yearly.rds"))
+inst_tbl <- read_csv(here("data", "institutions.csv"), show_col_types = FALSE)
+
+inst   <- programs %>% filter(unitid == params$unitid)
+me     <- inst$opeid6[1]
+my_nm  <- inst$instnm[1]
+my_st  <- inst$stabbr[1]
+current <- inst %>% filter(exists_in_2024_or_2025 == 1)
+tested  <- current %>% filter(earnings_test != "Not tested")
+```
+
+## 1. Who is at risk? Programs within 10 percent of the benchmark
+
+```{r}
+#| label: at-risk
+tested %>%
+  filter(abs(earnings_margin_pct) <= 0.10) %>%
+  arrange(earnings_margin_pct) %>%
+  select(credlev, cip4_title, t4enrl_prg_2025, md_earn_wne_p4, earn_bnchmrk_cip2_wageb, earnings_margin_pct, earnings_test) %>%
+  gt() %>%
+  cols_label(credlev = "Level", cip4_title = "Program", t4enrl_prg_2025 = "Enrolled",
+             md_earn_wne_p4 = "Earnings", earn_bnchmrk_cip2_wageb = "Benchmark",
+             earnings_margin_pct = "Margin", earnings_test = "Result") %>%
+  fmt_number(t4enrl_prg_2025, decimals = 0) %>%
+  fmt_currency(c(md_earn_wne_p4, earn_bnchmrk_cip2_wageb), decimals = 0) %>%
+  fmt_percent(earnings_margin_pct, decimals = 1) %>%
+  tab_header(title = "Within ten percent of the line, either side")
+```
+
+## 2. Which benchmark was each program held to?
+
+```{r}
+#| label: which-test
+tested %>%
+  count(credlev, which_test_cip2_wageb) %>%
+  pivot_wider(names_from = credlev, values_from = n, values_fill = 0) %>%
+  gt(rowname_col = "which_test_cip2_wageb") %>%
+  tab_header(title = "Benchmark applied, by credential level",
+             subtitle = "Undergraduate programs face the high school median; graduate programs face bachelor's holders in the field")
+```
+
+## 3. Ten years of Pell, as a share of Title IV enrollment
+
+```{r}
+#| label: pell-trend
+#| fig-height: 4
+yearly %>%
+  filter(opeid6 == me) %>%
+  group_by(award_year, credlev) %>%
+  summarise(pell = sum(pell_stu_count, na.rm = TRUE),
+            enrl = sum(t4enrl_prg, na.rm = TRUE), .groups = "drop") %>%
+  filter(enrl > 0) %>%
+  mutate(share = pell / enrl) %>%
+  ggplot(aes(award_year, share, colour = credlev)) +
+  geom_line(linewidth = 1) + geom_point() +
+  scale_y_continuous(labels = label_percent()) +
+  scale_x_continuous(breaks = 2016:2025) +
+  labs(x = "Award year (ending)", y = "Pell recipients / Title IV students", colour = NULL,
+       title = paste("Pell share of Title IV enrollment,", my_nm)) +
+  theme_minimal() + theme(legend.position = "top")
+```
+
+## 4. Debt against earnings, one point per program
+
+```{r}
+#| label: debt-earn
+#| fig-height: 5
+current %>%
+  filter(!is.na(debt_all_stgp_eval_mdn), !is.na(md_earn_wne_p4)) %>%
+  ggplot(aes(debt_all_stgp_eval_mdn, md_earn_wne_p4, colour = credlev, size = t4enrl_prg_2025)) +
+  geom_point(alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "grey50") +
+  scale_x_continuous(labels = label_dollar()) +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_size_continuous(guide = "none") +
+  labs(x = "Median debt at completion (2019 dollars)", y = "Median earnings, four years out (2024 dollars)",
+       colour = NULL, title = "Below the dashed line, graduates owe more than they earn in a year") +
+  theme_minimal() + theme(legend.position = "top")
+```
+
+## 5. Everyone in my state: pass and fail by control
+
+```{r}
+#| label: state
+programs %>%
+  filter(stabbr == my_st, exists_in_2024_or_2025 == 1, earnings_test != "Not tested") %>%
+  count(control, credlev, earnings_test) %>%
+  pivot_wider(names_from = earnings_test, values_from = n, values_fill = 0) %>%
+  mutate(`Fail rate` = Fail / (Fail + Pass)) %>%
+  gt(groupname_col = "control") %>%
+  fmt_percent(`Fail rate`, decimals = 1) %>%
+  tab_header(title = paste("Earnings test results in", my_st), subtitle = "Tested programs with current enrollment")
+```
+
+## 6. Peers, same program
+
+```{r}
+#| label: peers
+peer_ids <- c(100858, 100751, 139959, 217882, 176080)
+programs %>%
+  filter(unitid %in% peer_ids, credlev == "Bachelor", cip4 == 5202) %>%   # 52.02 Business Administration
+  select(instnm, t4enrl_prg_2025, md_earn_wne_p4, earn_bnchmrk_cip2_wageb, earnings_margin, debt_all_stgp_eval_mdn) %>%
+  arrange(desc(md_earn_wne_p4)) %>%
+  gt() %>%
+  cols_label(instnm = "Institution", t4enrl_prg_2025 = "Enrolled 2024-25", md_earn_wne_p4 = "Earnings",
+             earn_bnchmrk_cip2_wageb = "Benchmark", earnings_margin = "Margin", debt_all_stgp_eval_mdn = "Median debt") %>%
+  fmt_number(t4enrl_prg_2025, decimals = 0) %>%
+  fmt_currency(c(md_earn_wne_p4, earn_bnchmrk_cip2_wageb, earnings_margin, debt_all_stgp_eval_mdn), decimals = 0) %>%
+  sub_missing(missing_text = "") %>%
+  tab_header(title = "Business Administration, bachelor's, five institutions")
+```

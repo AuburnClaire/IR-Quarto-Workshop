@@ -1,0 +1,25 @@
+# Raw Department of Education files (300 MB). Download links: PPD-data/README.md
+PPD-data/*.xlsx
+PPD-data/*.csv
+PPD-data/cache/
+
+# Quarto and R working files
+.quarto/
+*_files/
+*_cache/
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# Rendered output from the exercises (re-render to recreate)
+output/
+templates/ipeds/*_upload.csv
+*.html
+*.pdf
+*.docx
+*.pptx
+!handout/*.pdf
+
+# Secrets never go here
+.Renviron

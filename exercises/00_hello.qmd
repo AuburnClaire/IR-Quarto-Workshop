@@ -1,0 +1,51 @@
+---
+title: "Hello from Quarto"
+author: "Your name here"
+date: today
+format: html
+params:
+  institution: "Auburn University"
+---
+
+This is a Quarto document. The text is Markdown. The grey boxes are R code.
+Click **Render** (the blue arrow above) and an HTML page opens.
+
+## Your machine
+
+```{r}
+#| echo: false
+cat("R", as.character(getRversion()), "rendered this on", format(Sys.Date(), "%B %d, %Y"))
+```
+
+## A table
+
+The table is made by code, so it is never out of date.
+
+```{r}
+#| echo: false
+library(gt)
+data.frame(
+  Step  = c("Write text", "Add code", "Click Render", "Hand it over"),
+  Tool  = c("Markdown", "R, Python or SQL", "Quarto", "HTML, PDF, Word, slides")
+) |>
+  gt() |>
+  tab_header(title = paste("Report for", params$institution))
+```
+
+## A chart
+
+```{r}
+#| echo: false
+#| fig-height: 3
+library(ggplot2)
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(colour = "#0C2340") +
+  labs(x = "Weight", y = "Miles per gallon", title = "Any chart you can make in R goes here") +
+  theme_minimal()
+```
+
+## Try one thing
+
+1. Change `author` at the top to your name and Render again.
+2. Change `format: html` to `format: typst` and Render. You get a PDF.
+3. Change it to `format: docx`. You get Word.

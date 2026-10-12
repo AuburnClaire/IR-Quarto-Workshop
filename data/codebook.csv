@@ -1,0 +1,138 @@
+table,variable,description,source,notes
+ppd_programs,opeid6,Six-digit OPEID of the institution,NSLDS,Primary institution key in PPD. Joins to every other table.
+ppd_programs,unitid,IPEDS UNITID of the main campus,IPEDS / College Scorecard,Use this to find your institution. Joins to anything IPEDS.
+ppd_programs,instnm,Institution name,IPEDS / College Scorecard,
+ppd_programs,city,City,IPEDS / College Scorecard,
+ppd_programs,stabbr,State or territory abbreviation,IPEDS / College Scorecard,
+ppd_programs,fips,State FIPS code,IPEDS / College Scorecard,
+ppd_programs,zip5,Five-digit ZIP,IPEDS / College Scorecard,
+ppd_programs,preddeg,Predominant degree awarded by the institution,College Scorecard,"Predominantly certificate, associate, or bachelor's"
+ppd_programs,control,"Public, Private Non-Profit, Private For-Profit",IPEDS / College Scorecard,
+ppd_programs,hbcu,1 if Historically Black College or University,IPEDS / College Scorecard,
+ppd_programs,tribal,1 if Tribal College,IPEDS / College Scorecard,
+ppd_programs,any_relg_affil,1 if any religious affiliation,College Scorecard,
+ppd_programs,t4enrl_inst_instate_p1819,Title IV students at the institution from in state,FAFSA,"Pooled 2017-18 and 2018-19. Institution-level, repeated on every program row."
+ppd_programs,t4enrl_inst_outstate_p1819,Title IV students at the institution from out of state,FAFSA,"Pooled 2017-18 and 2018-19. Institution-level."
+ppd_programs,pct_t4enrl_instate_p1819,Percent of Title IV students from in state,FAFSA,Institution-level.
+ppd_programs,pct_t4enrl_outstate_p1819,Percent of Title IV students from out of state,FAFSA,Institution-level.
+ppd_programs,outstate_flag,1 if more than half of Title IV students are from out of state,FAFSA,Institution-level.
+ppd_programs,foreign_flag,1 if located in a U.S. territory or freely associated state,IPEDS,
+ppd_programs,exists_in_2024_or_2025,1 if the program had Title IV enrollment in 2023-24 or 2024-25,NSLDS,Filter on this for current programs.
+ppd_programs,cip2,Two-digit CIP code as a number,College Scorecard,2010 CIP unless the program exists only in 2020 CIP.
+ppd_programs,cip2_title,Two-digit CIP title,College Scorecard,Commas restored by the ingest script.
+ppd_programs,cip4,Four-digit CIP code as a number (901 means 09.01),College Scorecard,Program key with opeid6 and credlev.
+ppd_programs,cip4_code,Four-digit CIP code as text (09.01),derived,Added by the ingest script for display.
+ppd_programs,cip4_title,Four-digit CIP title,College Scorecard,Commas restored by the ingest script.
+ppd_programs,credlev,Credential level,College Scorecard,"Undergrad Certificate, Associate, Bachelor, Post-Bacc Certificate, Master's, Doctoral, First Professional Degree, Graduate Certificate"
+ppd_programs,pct_ctotalm_p1819,Percent of completers who are men,IPEDS,"All completers, not only Title IV. Pooled 2017-18 and 2018-19."
+ppd_programs,pct_ctotalw_p1819,Percent of completers who are women,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_caiant_p1819,Percent of completers American Indian or Alaska Native,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_casiat_p1819,Percent of completers Asian,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_cbkaat_p1819,Percent of completers Black,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_chispt_p1819,Percent of completers Hispanic or Latino,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_cnhpit_p1819,Percent of completers Native Hawaiian or Pacific Islander,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_cwhitt_p1819,"Percent of completers White, non-Hispanic",IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_c2mort_p1819,Percent of completers two or more races,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_cunknt_p1819,Percent of completers race unknown,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,pct_cnralt_p1819,Percent of completers U.S. nonresident,IPEDS,Pooled 2017-18 and 2018-19.
+ppd_programs,count_wne_p4,Completers working and not enrolled four years after exit,IRS,"Pooled 2017-18 and 2018-19 completer cohorts. The denominator for md_earn_wne_p4."
+ppd_programs,md_earn_wne_p4,Median earnings four years after exit,IRS,"2017-18 and 2018-19 cohorts, earnings in 2022 and 2023, in 2024 dollars. THE earnings number for the test. Suppressed if 15 or fewer students, with statistical noise added."
+ppd_programs,count_wne_p4_1516,Completers working and not enrolled four years after exit,College Scorecard,Pooled 2014-15 and 2015-16 cohorts.
+ppd_programs,md_earn_wne_p4_1516,Median earnings four years after exit,College Scorecard,"2014-15 and 2015-16 cohorts, in 2024 dollars. The earlier cohort, for comparison."
+ppd_programs,count_ne_p3_1516,Completers not enrolled three years after exit,College Scorecard,Pooled 2014-15 and 2015-16 cohorts.
+ppd_programs,md_earn_ne_p3_1516,Median earnings three years after exit,College Scorecard,"2014-15 and 2015-16 cohorts, in 2024 dollars. Used by the 2023 GE test."
+ppd_programs,debt_all_stgp_eval_n,Completers with federal loan debt,College Scorecard,Pooled 2017-18 and 2018-19 cohorts.
+ppd_programs,debt_all_stgp_eval_mean,Mean Stafford and Grad PLUS debt of completers,College Scorecard,In 2019 dollars. Not the same dollars as earnings.
+ppd_programs,debt_all_stgp_eval_mdn,Median Stafford and Grad PLUS debt of completers,College Scorecard,In 2019 dollars. Borrowers only.
+ppd_programs,fail_obbb_cip2_wageb,1 if md_earn_wne_p4 is below earn_bnchmrk_cip2_wageb,OCE,"Raw flag. Prefer mstr_obbb_fail_cip2_wageb, which applies the full rule."
+ppd_programs,which_test_cip2_wageb,Which benchmark the program was held to,OCE,"Same-State HS Median, National HS Median, Same-State Same-Field BA Median, Same-State BA Median, National Same-Field BA Median, National BA Median, Tie for Lowest Test, Not Listed in Section 84001"
+ppd_programs,earn_bnchmrk_cip2_wageb,The earnings benchmark applied to this program,OCE,In 2024 dollars from the 2023 ACS five-year estimates.
+ppd_programs,missing_test_cip2_wageb,1 if a graduate program is missing one or more benchmarks,OCE,Graduate programs only.
+ppd_programs,hs_state_mdn_cip2_wageb,Median earnings of 25 to 34 year olds in the state with only a high school diploma,OCE / ACS,"Working, not enrolled. 2024 dollars."
+ppd_programs,hs_nat_mdn_cip2_wageb,Median earnings of 25 to 34 year olds nationally with only a high school diploma,OCE / ACS,2024 dollars.
+ppd_programs,ba_state_field_mdn_cip2_wageb,Median earnings of bachelor's holders in the state in the same two-digit CIP field,OCE / ACS,The graduate program benchmark.
+ppd_programs,ba_state_mdn_cip2_wageb,Median earnings of bachelor's holders in the state,OCE / ACS,
+ppd_programs,ba_nat_field_mdn_cip2_wageb,Median earnings of bachelor's holders nationally in the same field,OCE / ACS,
+ppd_programs,ba_nat_mdn_cip2_wageb,Median earnings of bachelor's holders nationally,OCE / ACS,
+ppd_programs,ever_ge,1 if the program was ever a gainful employment program 2015-16 to 2024-25,OCE,Certificates anywhere and degrees at for-profits.
+ppd_programs,ge_earn_test_bm_2023,Benchmark under the 2023 GE rule,OCE / ACS,2024 dollars.
+ppd_programs,ge_earn_test_2023_fail,Result of the 2023 GE earnings test as a label,OCE,"Text: Not GE Program / GE Program, Missing Earnings Data / Pass ... / Fail ..."
+ppd_programs,ge_earn_test_bm_algn,Benchmark aligned with the OBBBA earnings test,OCE / ACS,The benchmark used by mstr_obbb_fail_cip2_wageb.
+ppd_programs,ge_earn_test_algn_fail,Result of the aligned GE earnings test as a label,OCE,Text label.
+ppd_programs,ge_annpmt,Estimated annual loan payment for 2017-18 and 2018-19 completers,OCE,"2019 dollars. Amortized 10, 15 or 20 years depending on credential."
+ppd_programs,ge_dte_anl_2023,Debt-to-earnings annual rate using 2023 GE earnings,OCE,GE programs only. Fails above 8 percent.
+ppd_programs,ge_dte_disc_2023,Debt-to-earnings discretionary rate using 2023 GE earnings,OCE,GE programs only. Fails above 20 percent.
+ppd_programs,ge_dte_anl_2023_fail,1 if annual rate fails,OCE,GE programs only.
+ppd_programs,ge_dte_disc_2023_fail,1 if discretionary rate fails,OCE,GE programs only.
+ppd_programs,ge_dte_overall_2023_fail,1 if either rate fails,OCE,GE programs only.
+ppd_programs,ge_dte_anl_algn,Debt-to-earnings annual rate using md_earn_wne_p4,OCE,GE programs only.
+ppd_programs,ge_dte_disc_algn,Debt-to-earnings discretionary rate using md_earn_wne_p4,OCE,GE programs only.
+ppd_programs,ge_dte_anl_algn_fail,1 if aligned annual rate fails,OCE,GE programs only.
+ppd_programs,ge_dte_disc_algn_fail,1 if aligned discretionary rate fails,OCE,GE programs only.
+ppd_programs,ge_dte_overall_algn_fail,1 if either aligned rate fails,OCE,GE programs only.
+ppd_programs,ge_overall_2023_fail,1 if the program fails the 2023 GE rule overall,OCE,GE programs only.
+ppd_programs,ge_overall_algn_fail,1 if the program fails the aligned GE rule overall,OCE,GE programs only.
+ppd_programs,mstr_obbb_fail_cip2_wageb,1 if the program fails the OBBBA earnings test; 0 passes; NA not tested,OCE,THE pass/fail flag. All credential levels.
+ppd_programs,earnings_test,"Pass, Fail, or Not tested",derived,From mstr_obbb_fail_cip2_wageb. Added by the ingest script.
+ppd_programs,earnings_margin,md_earn_wne_p4 minus earn_bnchmrk_cip2_wageb,derived,Dollars above (positive) or below (negative) the benchmark.
+ppd_programs,earnings_margin_pct,earnings_margin divided by the benchmark,derived,0.10 means ten percent above the benchmark.
+ppd_programs,t4enrl_prg_2025,Title IV enrollment in 2024-25,NSLDS,Copied from ppd_yearly for convenience.
+ppd_programs,t4enrl_prg_2024,Title IV enrollment in 2023-24,NSLDS,Copied from ppd_yearly.
+ppd_programs,t4completers_2025,Title IV completers in 2024-25,NSLDS,Copied from ppd_yearly.
+ppd_programs,pell_stu_count_2025,Pell recipients in 2024-25,NSLDS,Copied from ppd_yearly.
+ppd_programs,loan_stu_count_2025,Federal loan borrowers in 2024-25 (unduplicated),NSLDS,Copied from ppd_yearly.
+ppd_programs,loan_vol_total_2025,Federal loan dollars disbursed in 2024-25,NSLDS,Nominal dollars. Copied from ppd_yearly.
+ppd_yearly,opeid6,Institution key,NSLDS,
+ppd_yearly,credlev,Credential level,College Scorecard,
+ppd_yearly,cip4,Four-digit CIP as a number,College Scorecard,
+ppd_yearly,award_year,Award year as the ending year (2016 means 2015-16),derived,2016 through 2025.
+ppd_yearly,award_year_label,Award year as text (2015-16),derived,
+ppd_yearly,t4enrl_prg,Title IV enrollment in the program,NSLDS,Counts of 10 to 19 are shown as 15. Under 10 is NA.
+ppd_yearly,t4completers,Title IV completers,NSLDS,
+ppd_yearly,t4noncompleters,Title IV students who earned nothing and enrolled nowhere in the next two years,NSLDS,Not available for 2024 and 2025.
+ppd_yearly,t4noncomplete_rate,t4noncompleters divided by t4enrl_prg,NSLDS,Computed from the rounded counts.
+ppd_yearly,pell_stu_count,Pell recipients,NSLDS,
+ppd_yearly,pell_vol,Pell dollars disbursed,NSLDS,Nominal dollars for that year.
+ppd_yearly,loan_stu_count,Federal loan borrowers (unduplicated),NSLDS,
+ppd_yearly,loan_vol_total,All federal loan dollars disbursed,NSLDS,Nominal dollars.
+ppd_yearly,loan_stu_count_sub_ug,Undergraduate subsidized borrowers,NSLDS,
+ppd_yearly,loan_vol_sub_ug,Undergraduate subsidized dollars,NSLDS,
+ppd_yearly,loan_stu_count_unsub_ug,Undergraduate unsubsidized borrowers,NSLDS,
+ppd_yearly,loan_vol_unsub_ug,Undergraduate unsubsidized dollars,NSLDS,
+ppd_yearly,loan_stu_count_unsub_gr,Graduate unsubsidized borrowers,NSLDS,
+ppd_yearly,loan_vol_unsub_gr,Graduate unsubsidized dollars,NSLDS,
+ppd_yearly,loan_stu_count_grad_plus_gr,Grad PLUS borrowers,NSLDS,
+ppd_yearly,loan_vol_grad_plus_gr,Grad PLUS dollars,NSLDS,
+ppd_yearly,loan_stu_count_par_plus_ug,Undergraduates whose parents borrowed Parent PLUS,NSLDS,
+ppd_yearly,loan_vol_par_plus_ug,Parent PLUS dollars,NSLDS,
+ppd_institution_yearly,opeid6,Institution key,NSLDS,
+ppd_institution_yearly,award_year,Award year as the ending year,derived,
+ppd_institution_yearly,t4enrl_ug_inst_instate,Title IV undergraduates from in state,NSLDS,Whole institution.
+ppd_institution_yearly,t4enrl_ug_inst_outstate,Title IV undergraduates from out of state,NSLDS,Whole institution.
+ppd_institution_yearly,t4enrl_gr_inst_instate,Title IV graduate students from in state,NSLDS,Whole institution.
+ppd_institution_yearly,t4enrl_gr_inst_outstate,Title IV graduate students from out of state,NSLDS,Whole institution.
+ppd_cip6_earnings,opeid6,Institution key,NSLDS,
+ppd_cip6_earnings,cip2,Two-digit CIP,College Scorecard,
+ppd_cip6_earnings,cip2_title,Two-digit CIP title,College Scorecard,
+ppd_cip6_earnings,cip4,Four-digit CIP,College Scorecard,
+ppd_cip6_earnings,cip4_title,Four-digit CIP title,College Scorecard,
+ppd_cip6_earnings,cip6,Six-digit CIP as a number,College Scorecard,
+ppd_cip6_earnings,cip6_code,Six-digit CIP as text (13.1202),derived,
+ppd_cip6_earnings,cip6_title,Six-digit CIP title,College Scorecard,
+ppd_cip6_earnings,credlev,Credential level,College Scorecard,
+ppd_cip6_earnings,count_ne_p3,Completers not enrolled three years after exit,IRS,Pooled 2017-18 and 2018-19 cohorts. Working and not working.
+ppd_cip6_earnings,md_earn_ne_p3,Median earnings three years after exit,IRS,"2017-18 and 2018-19 cohorts, 2024 dollars. The level of detail the official file will use."
+institutions,opeid6,Institution key,NSLDS,
+institutions,unitid,IPEDS UNITID,IPEDS,Search this file by name to find yours.
+institutions,instnm,Institution name,IPEDS,
+institutions,city,City,IPEDS,
+institutions,stabbr,State,IPEDS,
+institutions,control,Control,IPEDS,
+institutions,preddeg,Predominant degree,College Scorecard,
+institutions,hbcu,1 if HBCU,IPEDS,
+institutions,tribal,1 if Tribal College,IPEDS,
+institutions,n_programs,Programs in PPD for this institution,derived,
+institutions,n_programs_2025,Programs with Title IV enrollment in 2023-24 or 2024-25,derived,
+institutions,t4enrl_2025,Title IV enrollment summed over programs in 2024-25,derived,Suppressed programs contribute zero.
+institutions,n_tested,Programs with an earnings test result,derived,
+institutions,n_fail,Programs that fail the earnings test,derived,

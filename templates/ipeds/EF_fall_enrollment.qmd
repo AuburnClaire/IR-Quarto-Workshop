@@ -1,0 +1,263 @@
+---
+title: "IPEDS Fall Enrollment (EF)"
+subtitle: "Template: one question per section, documented as it is computed"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+    code-fold: true
+    code-summary: "Show the code"
+params:
+  report_year: 2026
+  census_term: "202710"
+  prior_file: ""
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tidyr)
+library(gt)
+library(readr)
+
+# IPEDS categories, in IPEDS order. Making race and gender factors with
+# these levels means every table shows every row, including zeros.
+race_levels <- c("Nonresident", "Hispanic/Latino", "American Indian or Alaska Native",
+                 "Asian", "Black or African American", "Native Hawaiian or Other Pacific Islander",
+                 "White", "Two or more races", "Race/ethnicity unknown")
+gender_levels <- c("Men", "Women")
+
+# One table shape for every Part A line: race down, gender across, totals.
+by_race_gender <- function(df) {
+  df |>
+    count(race, gender, .drop = FALSE) |>
+    pivot_wider(names_from = gender, values_from = n, values_fill = 0) |>
+    mutate(Total = Men + Women)
+}
+
+# The upload data frame. Every question appends its rows here.
+upload <- tibble(part = character(), line = character(), cell = character(), value = numeric())
+add_rows <- function(part, line, df) {
+  # df has columns cell and value
+  upload <<- bind_rows(upload, tibble(part = part, line = line, cell = df$cell, value = df$value))
+  invisible(df)
+}
+```
+
+::: {.callout-important title="This is a template on fake data"}
+The population chunk below invents 3,000 students so the document renders
+anywhere. To use it, replace that one chunk with the population query
+against your warehouse (an example is in the chunk after it, not run).
+Every question section stays exactly as it is.
+:::
+
+# The population
+
+One query builds every student who could count for this survey, with every
+column any question needs. The questions never touch the database; they
+filter this.
+
+**Rule.** Students enrolled for credit as of the fall census date
+(`r params$census_term`). One row per student. Columns are IPEDS
+categories, not Banner codes: the mapping from codes to categories happens
+here, once, and nowhere else.
+
+```{r}
+#| label: population-fake
+set.seed(params$report_year)
+n <- 3000
+pop <- tibble(
+  id          = sprintf("S%05d", seq_len(n)),
+  level       = sample(c("Undergraduate", "Graduate"), n, TRUE, c(0.8, 0.2)),
+  attendance  = sample(c("Full-time", "Part-time"), n, TRUE, c(0.85, 0.15)),
+  gender      = sample(c("Men", "Women"), n, TRUE),
+  race        = sample(c("Nonresident", "Hispanic/Latino", "American Indian or Alaska Native",
+                         "Asian", "Black or African American", "Native Hawaiian or Other Pacific Islander",
+                         "White", "Two or more races", "Race/ethnicity unknown"),
+                       n, TRUE, c(0.06, 0.05, 0.005, 0.03, 0.07, 0.002, 0.68, 0.04, 0.063)),
+  first_time  = sample(c(TRUE, FALSE), n, TRUE, c(0.25, 0.75)),
+  degree_seeking = sample(c(TRUE, FALSE), n, TRUE, c(0.97, 0.03)),
+  age         = pmax(17, round(rnorm(n, 22, 4)))
+) |>
+  mutate(first_time = first_time & level == "Undergraduate",
+         race   = factor(race, levels = race_levels),
+         gender = factor(gender, levels = gender_levels))
+```
+
+```{r}
+#| label: population-real
+#| eval: false
+# The real thing. Column names in the SELECT are the IPEDS categories the
+# questions use, so nothing below has to know what the codes were.
+con <- DBI::dbConnect(odbc::odbc(), dsn = "MY_DSN",
+                      UID = "my_user", PWD = keyring::key_get("my_service", "my_user"))
+pop <- DBI::dbGetQuery(con, "
+  SELECT student_id                                   AS id,
+         CASE WHEN level_code = 'UG' THEN 'Undergraduate' ELSE 'Graduate' END AS level,
+         CASE WHEN credit_hours >= 12 OR (level_code <> 'UG' AND credit_hours >= 9)
+              THEN 'Full-time' ELSE 'Part-time' END   AS attendance,
+         ipeds_gender                                 AS gender,
+         ipeds_race_category                          AS race,
+         CASE WHEN first_time_flag = 'Y' THEN 1 ELSE 0 END AS first_time,
+         CASE WHEN degree_seeking_flag = 'Y' THEN 1 ELSE 0 END AS degree_seeking,
+         age_on_census_date                           AS age
+    FROM my_schema.fall_census_enrollment
+   WHERE term_code = ?", params = list(params$census_term)) |>
+  mutate(first_time = first_time == 1, degree_seeking = degree_seeking == 1,
+         race   = factor(race, levels = race_levels),
+         gender = factor(gender, levels = gender_levels))
+DBI::dbDisconnect(con)
+```
+
+```{r}
+#| label: population-summary
+tibble(What = c("Students in the population", "Undergraduate", "Graduate", "First-time undergraduates"),
+       Count = c(nrow(pop), sum(pop$level == "Undergraduate"), sum(pop$level == "Graduate"), sum(pop$first_time))) |>
+  gt() |> fmt_number(Count, decimals = 0) |> tab_options(column_labels.hidden = TRUE)
+```
+
+# Part A, line 1: full-time first-time degree-seeking undergraduates
+
+::: {.callout-note title="IPEDS asks"}
+**Part A, Line 1.** Full-time, first-time degree/certificate-seeking
+undergraduate students, by race/ethnicity and gender.
+:::
+
+**Rule.** Undergraduate level; attending full-time (12 or more credit
+hours); first-time as IPEDS defines it (no prior postsecondary enrollment
+after high school, with the summer-start exception applied in the
+population query); degree-seeking. Counted once each, in the race category
+from the population.
+
+```{r}
+#| label: ef-a-1
+a1 <- pop |>
+  filter(level == "Undergraduate", attendance == "Full-time", first_time, degree_seeking) |>
+  by_race_gender()
+
+a1 |> gt(rowname_col = "race") |> grand_summary_rows(columns = c(Men, Women, Total), fns = list(Total = ~ sum(.)), fmt = ~ fmt_number(., decimals = 0))
+
+add_rows("A", "1", a1 |> pivot_longer(c(Men, Women), names_to = "gender", values_to = "value") |>
+           mutate(cell = paste(race, gender, sep = " | ")) |> select(cell, value))
+```
+
+# Part A, line 7: all full-time undergraduates
+
+::: {.callout-note title="IPEDS asks"}
+**Part A, Line 7.** Total full-time undergraduate students, by
+race/ethnicity and gender.
+:::
+
+**Rule.** Undergraduate level; full-time. First-time or not, degree-seeking
+or not. Line 1 is a subset of this line, which the checks section verifies.
+
+```{r}
+#| label: ef-a-7
+a7 <- pop |>
+  filter(level == "Undergraduate", attendance == "Full-time") |>
+  by_race_gender()
+
+a7 |> gt(rowname_col = "race") |> grand_summary_rows(columns = c(Men, Women, Total), fns = list(Total = ~ sum(.)), fmt = ~ fmt_number(., decimals = 0))
+
+add_rows("A", "7", a7 |> pivot_longer(c(Men, Women), names_to = "gender", values_to = "value") |>
+           mutate(cell = paste(race, gender, sep = " | ")) |> select(cell, value))
+```
+
+# Part B: enrollment by age
+
+::: {.callout-note title="IPEDS asks"}
+**Part B.** Enrollment by age category, attendance status, and level.
+(Required in odd-numbered years.)
+:::
+
+**Rule.** Age on the census date, in the IPEDS bands. A student whose age
+is unknown goes in "Age unknown", which the population query would supply
+as NA.
+
+```{r}
+#| label: ef-b
+b <- pop |>
+  mutate(age_band = case_when(
+    is.na(age) ~ "Age unknown",
+    age < 18   ~ "Under 18",
+    age <= 19  ~ "18-19",
+    age <= 21  ~ "20-21",
+    age <= 24  ~ "22-24",
+    age <= 29  ~ "25-29",
+    age <= 34  ~ "30-34",
+    age <= 39  ~ "35-39",
+    age <= 49  ~ "40-49",
+    age <= 64  ~ "50-64",
+    TRUE       ~ "65 and over")) |>
+  count(level, attendance, age_band) |>
+  pivot_wider(names_from = c(level, attendance), values_from = n, values_fill = 0)
+
+b |> gt(rowname_col = "age_band") |> tab_spanner_delim(delim = "_")
+
+add_rows("B", "all", b |> pivot_longer(-age_band, names_to = "col", values_to = "value") |>
+           mutate(cell = paste(age_band, col, sep = " | ")) |> select(cell, value))
+```
+
+# Checks
+
+A submission that does not reconcile should not render. These stop the
+document if they fail.
+
+```{r}
+#| label: checks
+#| echo: true
+# Line 1 is a subset of line 7, race by race (joined by name, never by position).
+cmp <- inner_join(a1, a7, by = "race", suffix = c("_l1", "_l7"))
+stopifnot(nrow(cmp) == length(race_levels), all(cmp$Total_l1 <= cmp$Total_l7))
+
+# Part A line 7 total equals the full-time undergraduate count in the population.
+stopifnot(sum(a7$Total) == sum(pop$level == "Undergraduate" & pop$attendance == "Full-time"))
+
+# Part B totals equal the population.
+stopifnot(sum(b[-1]) == nrow(pop))
+
+cat("All checks passed.\n")
+```
+
+```{r}
+#| label: prior-year
+#| eval: !expr nzchar(params$prior_file)
+# Side by side with last year's upload, flagging changes over 10 percent.
+prior <- read_csv(params$prior_file, show_col_types = FALSE)
+upload |>
+  inner_join(prior, by = c("part", "line", "cell"), suffix = c("", "_prior")) |>
+  mutate(change = (value - value_prior) / value_prior,
+         flag = if_else(abs(change) > 0.10 & value_prior >= 10, "review", "")) |>
+  gt() |> fmt_percent(change, decimals = 1)
+```
+
+# Upload file
+
+```{r}
+#| label: upload
+#| echo: true
+out <- sprintf("EF_%d_upload.csv", params$report_year)
+write_csv(upload, out)
+cat(nrow(upload), "cells written to", out, "\n")
+```
+
+For the portal's key-value format, replace this chunk with the
+`IPEDSuploadables` call for Fall Enrollment, or with `writeLines()` per the
+import specification. Either way the file is a product of the render.
+
+# Appendix: this run
+
+```{r}
+#| label: appendix
+#| echo: true
+cat("Rendered", format(Sys.time(), "%Y-%m-%d %H:%M"), "for report year", params$report_year, "\n")
+cat("Census term", params$census_term, "\n")
+cat("Population:", nrow(pop), "students\n")
+sessionInfo()$R.version$version.string
+```
