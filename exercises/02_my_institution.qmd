@@ -9,7 +9,10 @@ format:
     toc-depth: 2
     embed-resources: true
 params:
-  unitid: 100858
+  unitid: 100858   # change this to yours and click Render
+# Auburn 100858 | UT San Antonio 229027 | Tarleton State 228529 | Albany State 138716
+# Alabama in Huntsville 100706 | Gardner-Webb 198561 | Furman 218070 | Wiley 229887
+# LSU 159391 | Northwestern State of Louisiana 160038 | any other: data/institutions.csv
 execute:
   echo: false
   warning: false

@@ -1,0 +1,115 @@
+---
+title: "One IPEDS question"
+subtitle: "A data set, a question, and Quarto to get the answer"
+date: today
+format:
+  html:
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tidyr)
+library(gt)
+library(readr)
+library(here)
+
+# The data set: one row per student on the fall census date.
+# This one is invented (3,000 made-up students) so it works on any machine.
+census <- read_csv(here("data", "fake_fall_census.csv"), show_col_types = FALSE)
+```
+
+## The data
+
+```{r}
+#| echo: true
+nrow(census)
+head(census, 5)
+```
+
+## The question
+
+::: {.callout-note title="IPEDS Fall Enrollment, Part A, line 1"}
+Full-time, first-time, degree/certificate-seeking undergraduate students,
+by race/ethnicity and gender.
+:::
+
+**The rule, in words.** Undergraduate level; full-time; first-time;
+degree-seeking. One count per race and gender.
+
+## The answer
+
+```{r}
+#| label: part-a-line-1
+#| echo: true
+a1 <- census |>
+  filter(level == "Undergraduate",
+         attendance == "Full-time",
+         first_time == "Y",
+         degree_seeking == "Y") |>
+  count(race, gender) |>
+  pivot_wider(names_from = gender, values_from = n, values_fill = 0) |>
+  mutate(Total = Men + Women)
+
+a1 |>
+  gt(rowname_col = "race") |>
+  tab_header(title = "Part A, line 1")
+```
+
+That is the submission for this line: the question, the rule, the code,
+and the numbers, in one file. Next year, change the data file and Render.
+
+## The same thing against your warehouse
+
+Not run here, because there is no database in the room. The only change
+is where `census` comes from. The filter and the count stay the same.
+
+```{r}
+#| label: from-the-warehouse
+#| eval: false
+#| echo: true
+con <- DBI::dbConnect(odbc::odbc(), dsn = "MY_DSN",
+                      UID = "my_user", PWD = keyring::key_get("my_service", "my_user"))
+
+census <- DBI::dbGetQuery(con, "
+  SELECT id, level, attendance, gender, race, first_time, degree_seeking, age
+    FROM my_schema.fall_census
+   WHERE term_code = '202710'
+")
+```
+
+Or, if you would rather do the counting in SQL and only show it in R:
+
+```{r}
+#| label: count-in-sql
+#| eval: false
+#| echo: true
+qry <- "
+  SELECT race, gender, COUNT(*) AS n
+    FROM my_schema.fall_census
+   WHERE term_code = '202710'
+     AND level = 'Undergraduate' AND attendance = 'Full-time'
+     AND first_time = 'Y' AND degree_seeking = 'Y'
+   GROUP BY race, gender
+"
+a1 <- DBI::dbGetQuery(con, qry)
+```
+
+## Try one thing
+
+1. Change the filter to `attendance == "Part-time"`. Render. You just
+   answered Part A, line 15.
+2. Copy the whole "The answer" section, paste it below, and change the
+   filter again. Two questions, two sections. Thirty questions is the
+   same file, longer.
+3. For a check, add a chunk with `stopifnot(sum(a1$Total) > 0)`.
+   If it is ever false, the document refuses to render, which is the
+   point.
+
+A full survey file built this way, with checks and an upload file, is
+`solutions/ipeds_full_template.qmd`.
