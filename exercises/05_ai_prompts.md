@@ -24,6 +24,10 @@ Paste the lines from `data/codebook.csv` for the columns you want, then:
 
 Paste the chunk into your qmd. Render. If it fails, go to Prompt 2.
 
+If you think in SQL, ask for SQL instead: "Write one Oracle SQL query
+against a table `population` with these columns that returns ...". Put it
+in a string, hand it to `dbGetQuery()`, and the rest is the same.
+
 ## Prompt 2: the error
 
 > Here is my R chunk: [paste chunk]. Here is the error: [paste the red
