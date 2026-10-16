@@ -30,51 +30,55 @@ to the document you are holding.*
 
 # Getting in
 
-Two doors, same room. Pick one. Switch if it does not work.
+Everything runs on your own laptop. Nothing leaves it. That is a feature,
+and it is the same arrangement you will want at home with real data.
 
-## Door 1: RStudio Desktop on your laptop
+## RStudio Desktop
 
 1. Open the project: double-click `IR-Quarto-Workshop.Rproj`.
 2. Files pane (bottom right): `setup/00_install_packages.R`. Click **Source**. Wait for "Done".
 3. `setup/01_check_setup.R`. Click **Source**. Ends with "Ready" or tells you what to fix.
 4. `exercises/00_hello.qmd`. Click **Render**. A web page opens. You are in.
 
-## Door 2: Posit Cloud, in a browser
+If step 1 fails because the laptop will not let you install R or RStudio,
+raise a hand. You will pair with a neighbor for the morning and leave with
+your institution's report already rendered.
 
-1. Free account at **posit.cloud**.
-2. Open the space link below. Click the project. Wait while it copies. Everything is installed.
-3. `exercises/00_hello.qmd`. Click **Render**. You are in.
-
-**Door 2 is for today's public data only.** Posit Cloud runs on servers
-you do not control, hosted on AWS. Posit describes itself as a data
-processor and will provide a data processing addendum on request, but we
-found no public FERPA or SOC 2 statement for the Cloud product, and no
-agreement between Posit and your institution exists unless your institution
-made one. Student records do not go there without your own institution's
-review and sign-off. The desktop stays on your machine, behind your
-institution's controls. That is why it is the door you take home.
-
-```{=typst}
-#block(width: 100%, inset: 12pt, stroke: 1pt + rgb("#E87722"), radius: 4pt)[
-  #text(size: 14pt, weight: "bold")[Posit Cloud space link:] #h(1em) #text(size: 14pt)[\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_]
-]
-```
+*For reference only:* Posit also offers RStudio in a browser, Posit Cloud,
+with nothing to install. We do not use it today. It is a hosted service on
+servers your institution does not control, with no FERPA agreement unless
+your institution has made one, so it is not a place for student records.
 
 ## Before anything else
 
-**Your UNITID:** \_\_\_\_\_\_\_\_\_\_ (search `data/institutions.csv` by name; Auburn is 100858)
+**Your UNITID:** \_\_\_\_\_\_\_\_\_\_ (it is in the email; or search `data/institutions.csv` by name)
 
 **An AI assistant you can log into:** ChatGPT, Claude, Copilot, Gemini. Any.
 
-**If you are already in:** turn to "The STATS report" and start exercise 1. Do not wait.
+**If you are already in:** turn to exercise 1 and start. Do not wait.
+
+## The morning
+
+| | | |
+|---|---|---|
+| 8:30 | Getting in | exercise 0 |
+| 8:45 | Why, the landscape, the toolbox | |
+| 9:15 | One IPEDS question | exercise 1 |
+| 9:35 | Your institution, from the federal data | exercise 2 |
+| 10:00 | Break | |
+| 10:10 | The room, one click | exercise 3 |
+| 10:25 | Improve it with an AI | exercise 4 |
+| 10:55 | The report you owe someone | exercise 5 |
+| 11:15 | Share, and take it home | |
 
 ## What you will leave with
 
-A report about your own institution built from the Department of
+An IPEDS question answered from a data set in a file that documents
+itself. A report about your own institution built from the Department of
 Education's 2026 Program Performance Data, the preview of the earnings
-accountability results that become official in February 2027. The code,
-the data, the documentation, and the output are one file. When the official
-file arrives, one script changes and your report re-renders.
+accountability results that become official in February 2027. Both
+improved by an AI you drove. And an outline of the report you actually
+owe someone, ready to fill.
 
 # Why
 
@@ -90,7 +94,7 @@ it. Hand it over. Re-run it next year.
 about how a number is made lives in a file anyone can read, including an AI.
 Student records stay in the system of record and are read at render time.
 
-## The landscape, and why these doors
+## The landscape, and why RStudio
 
 | Where people are | Good at | Weak at |
 |---|---|---|
@@ -100,18 +104,50 @@ Student records stay in the system of record and are read at render time.
 | Jupyter, Colab, Databricks | Python exploration | publishing; Quarto renders notebooks too |
 | VS Code, Positron | multi-language IDEs | newer; Positron is Posit's next IDE, worth watching |
 | **RStudio Desktop** | free, stable, Quarto built in, one-button render, the IR community | needs an install |
-| **Posit Cloud** | nothing to install; a browser | 1 GB on the free plan; cannot see your warehouse |
+| Posit Cloud | RStudio in a browser, nothing to install | hosted outside your institution; not for student records; not used today |
 | Posit Workbench and Connect | the server versions: shared, scheduled, published | enterprise licenses |
 
-## What Auburn did
+## What Auburn built
 
-For twenty years an Access database produced each year's college transfer
-feedback reports. In 2026 the logic was read out of the VBA into plain
-rules, re-implemented in Oracle and a Quarto template, and the old and new
-systems were run on the same cohort and compared figure by figure. The
-comparison matched, and found three errors the Access report had carried
-for years. Then the Quarto template rendered one PDF per college, 46 of
-them, in one run.
+**High school feedback reports.** Every year, one Access report printed as
+a single PDF of more than 3,500 pages, cut by hand into more than 360
+files, each named by hand. Now one Quarto template, one parameter, and a
+loop: 360 PDFs with the right names in one run. The rules were read out of
+the Access logic and written down before anything was re-implemented, and
+the old and new were run on the same year and compared figure by figure.
+
+**Parent portal retention.** A Quarto HTML report for Student Affairs on
+the office's portal, behind campus sign-in, visible only to the people
+whose role allows it. The same tool that made the PDFs makes a web page;
+the portal decides who sees it.
+
+**College of Agriculture major changes.** Heatmaps on a rolling ten-cohort
+window that advances by itself each August, with an "about the data" box
+that states the cohort range and is generated, not typed. A report that
+updates itself and documents itself.
+
+**IPEDS.** One survey file per component, one section per question, the
+SQL inside the chunks, checks that print "no errors" or the rows, the
+upload file written by the last chunk. The Access database, as a document
+that runs.
+
+## Three verbs that are not the same thing
+
+| Verb | Means | Where |
+|---|---|---|
+| **Run** | execute one chunk, or one line, in the Console, right now; the output appears below the chunk; nothing is written to disk | the green arrow on a chunk; Ctrl+Enter on a line |
+| **Render** | execute every chunk from the top in a fresh session and build the output file (HTML, PDF, Word) | the Render button; `quarto render` in the Terminal |
+| **Publish** | copy a rendered output somewhere other people can open it | `quarto publish`; or drop the file on a server, SharePoint, the portal |
+
+Run is for thinking. Render is for the document. Publish is for the
+audience. A chunk that Runs but does not Render was depending on something
+in your session that the document never loaded; Render is the test.
+
+**Source and Visual.** The two buttons at the top left of the editor. Same
+file, two views. Source is the plain text: the marks, the fences, the
+YAML. Visual looks like a word processor. People write in Visual; an AI
+writes Source, because Source is what you paste into it and what it hands
+back. Learn to read both. Nothing is lost switching, ever.
 
 # What is inside RStudio
 
@@ -149,6 +185,14 @@ with Zotero. `brand.yml` for institutional colors, fonts and logo in one file.
 | Higher ed | `educationdata` (IPEDS by API), `tidycensus`, `rscorecard`, `IPEDSuploadables` |
 | AI | GitHub Copilot (built into RStudio; subscription), `ellmer` (call a model from code), `chattr` |
 
+## Also exists, not covered today
+
+**Shiny** makes interactive dashboards: the reader picks a term or a
+college and the page changes. Same `dplyr` and `ggplot2` inside; it needs
+a server to run on, which is the cost. Quarto's `dashboard` format and
+Shinylive give lighter versions with no server. **Posit Cloud** is RStudio
+in a browser; see the note on the first page.
+
 ## Publishing
 
 `quarto publish quarto-pub` (free, public). GitHub Pages. Netlify. Posit
@@ -166,142 +210,89 @@ of comments. Feedback reports to feeder institutions, one PDF each.
 
 {{< pagebreak >}}
 
-# IPEDS, question by question
+# Exercise 1: one IPEDS question
 
-*Cecile's segment. Notes space.*
+*Cecile's segment. A data set, a question, and Quarto to get the answer.*
 
-```{=typst}
-#v(1em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
-#line(length: 100%, stroke: 0.5pt + gray) #v(1.2em)
+1. Open `exercises/01_ipeds.qmd`. Click **Render**.
+2. Read the file top to bottom. The data set is a CSV of 3,000 invented
+   students. The question is quoted from the IPEDS form. The rule is one
+   sentence. The chunk filters and counts. The table is the answer.
+3. **Try one thing.** Change `attendance == "Full-time"` to
+   `"Part-time"`. Render. You just answered a different line.
+4. Copy the whole "The answer" section, paste it below itself, change the
+   filter again. Two questions, two sections. Thirty questions is the same
+   file, longer.
+
+**If you know SQL better than R, this is for you.** Most of the code in
+an IPEDS file is SQL. R is the wrapper: it hands the query to the
+database, catches the result, and shows it or tests it. The last two
+chunks in the file show it: the same count with the data coming from a
+warehouse, and the count done in SQL. One chunk, Cecile's shape:
+
+```r
+qry <- "
+  SELECT academic_period, id, program, degree_code, college, dept
+    FROM my_schema.degrees_prelim
+   WHERE dept IS NULL OR dept = ''
+"
+error_dept <- dbGetQuery(con, qry)
+
+if (nrow(error_dept) == 0) {
+  cat("No department errors.\n")
+} else {
+  error_dept
+}
 ```
 
-{{< pagebreak >}}
+The SQL is the rule. The `if` is the check. The rendered page shows a
+sentence or the rows. Thirty of these is an error report; thirty counting
+queries is a survey.
 
-# The STATS report: exercises 1 to 3
+**Access to Oracle to Quarto: what changes.** Cecile's notes from making
+the move. The full table is in the primer.
 
-## Exercise 1: your institution
+| | Access | Oracle | R / Quarto |
+|---|---|---|---|
+| Crosstab | `TRANSFORM ... PIVOT` | `PIVOT` | `pivot_wider()` |
+| Conditional | `IIf()` | `CASE WHEN` | `if_else()`, `case_when()` |
+| Wildcards | `*` `?` | `%` `_` | pattern in `str_detect()` |
+| Strings | `"double"` | `'single'` | either |
+| Parameter | `[prompt]`, retyped each run | `:bind`, per query | `params$x`, once per document; a file path can be one |
+| Comments | a hidden properties box | `--` in the SQL | in the code and in the prose around it |
+| One component | 30 min to hours, ~30 queries one by one, stalls on big results | 5 to 15 min, ~10 queries | up to 5 min, all together, output recorded |
 
-1. Open `exercises/01_my_institution.qmd`.
-2. Near the top, change `unitid: 100858` to your UNITID.
+A full survey file built this way, with checks that stop the render and
+an upload file written by the last chunk, is
+`solutions/ipeds_full_template.qmd`.
+
+# Exercise 2: your institution, from the federal data
+
+1. Open `exercises/02_my_institution.qmd`.
+2. Near the top, change `unitid: 100858` to your UNITID. The room's are
+   in a comment right there.
 3. Click **Render**. Read it. Every number came from `data/`; every table
    and chart from a code chunk you can see.
+4. Change `format:` at the top to `typst`. Render. A PDF, with nothing
+   extra installed. Notice the last section, "Every current program", is
+   gone: in the file it is wrapped in
+   `::: {.content-visible when-format="html"}`. Long tables for the web,
+   short ones for paper, one source. Change it back to `html` when done.
 
 Then look at the file. The YAML block at the top is settings. `params` is
 the one thing that changes between institutions. Each grey block is a
 chunk; `#| echo: false` hides the code from the reader. Everything else is
 Markdown.
 
-**Now click Source, then Visual.** The two buttons at the top left of the
-editor. Same file, two views. Source is the plain text: the marks, the
-fences, the YAML. Visual looks like a word processor: headings are big,
-tables are grids, chunks are boxes. People write in Visual; an AI writes
-Source, because Source is what it was trained on and what you paste into
-it. Learn to read both. When an assistant hands you a chunk, you are
-reading Source; when you fix the sentence above it, you are probably in
-Visual. Nothing is lost switching, ever.
+## What the data is
 
-**Three verbs that are not the same thing.**
-
-| Verb | Means | Where |
-|---|---|---|
-| **Run** | execute one chunk, or one line, in the Console, right now; the output appears below the chunk; nothing is written to disk | the green arrow on a chunk; Ctrl+Enter on a line |
-| **Render** | execute every chunk from the top in a fresh session and build the output file (HTML, PDF, Word) | the Render button; `quarto render` in the Terminal |
-| **Publish** | copy a rendered output somewhere other people can open it | `quarto publish`; or drop the file on a server, SharePoint, the portal |
-
-Run is for thinking. Render is for the document. Publish is for the
-audience. A chunk that Runs but does not Render was depending on something
-in your session that the document never loaded; Render is the test.
-
-## Exercise 2: the same report, four ways
-
-Change the `format:` block and Render each time. Change it back after.
-
-| Want | Write |
-|---|---|
-| Word | `format: docx` |
-| PDF | `format: typst` |
-| Slides | `format: revealjs` |
-| All three at once | list them, then in the Terminal tab: `quarto render exercises/01_my_institution.qmd` |
-
-Notice the last section, "Every current program", is missing from the PDF.
-In the file it is wrapped in `::: {.content-visible when-format="html"}`.
-Long tables for the web, short ones for paper, one source.
-
-## Exercise 3: five institutions, one click
-
-1. Open `exercises/03_render_peers.R`.
-2. Edit the list of names and UNITIDs. Change `format` if you want PDFs.
-3. Click **Source**. Five reports appear in `output/`.
-
-This is the whole trick behind one-PDF-per-college, one-report-per-
-department, one-profile-per-program. The template does not know how many
-there are.
-
-## Exercise 6: the IPEDS pattern (for later, or for the fast)
-
-1. Open `templates/ipeds/EF_fall_enrollment.qmd`. Render it. It runs on
-   3,000 invented students, so it works anywhere.
-2. Read one question section: the IPEDS question quoted, the rule in
-   prose, the chunk, the answer. Four pieces, every question.
-3. Find the checks section. Change a rule so a check fails. Render. It
-   refuses. That refusal is the feature.
-
-`docs/ipeds-tutorial-for-cecile.md` explains the pattern: one population
-query, many small question chunks, checks that stop the render, an upload
-file written by the last chunk, and the year as a parameter. Replace the
-fake-data chunk with your census query and the rest stays.
-
-## If it breaks
-
-| Message | Means |
-|---|---|
-| `No programs found for unitid` | typo, or your campus reports under a parent OPEID; search `institutions.csv` by name |
-| `could not find function` | a package is not loaded; add `library(...)` in the setup chunk |
-| `object 'x' not found` | a chunk above did not run; Render runs them in order from the top |
-| the PDF table is cut off | shorten column labels or drop a column; or keep it HTML-only |
-
-# The data, and exercise 4
-
-## What PPD:2026 is
-
-Published by the Department of Education in December 2025, updated January
-8, 2026, for the AHEAD negotiated rulemaking. One row per **institution ×
-credential level × 4-digit CIP**: 209,321 programs at 5,096 institutions.
-A preview, for information only. The official results under STATS (the
-Student Tuition and Transparency System, from the One Big Beautiful Bill
-Act) arrive **February 2027** at the 6-digit CIP level.
-
-## The tables in `data/`
-
-| File | One row per | Use for |
-|---|---|---|
-| `ppd_programs.rds` | program | today: earnings, debt, benchmark, pass/fail, completer demographics |
-| `ppd_yearly.rds` | program × award year | 2015-16 to 2024-25: enrollment, completers, Pell, every loan type |
-| `ppd_institution_yearly.rds` | institution × year | in-state and out-of-state Title IV enrollment |
-| `ppd_cip6_earnings.rds` | program at 6-digit CIP | the earnings detail the official file will use |
-| `institutions.csv` | institution | find a UNITID; compare institutions |
-| `codebook.csv` | column | every column, what it means, where it came from |
+The **2026 Program Performance Data (PPD:2026)**, published by the
+Department of Education in December 2025, updated January 8, 2026, for the
+AHEAD negotiated rulemaking. One row per **institution × credential level
+× 4-digit CIP**: 209,321 programs at 5,096 institutions. A preview, for
+information only. The official results under STATS (the Student Tuition
+and Transparency System, from the One Big Beautiful Bill Act) arrive
+**February 2027** at the 6-digit CIP level.
 
 ## Three things to know before computing anything
 
@@ -319,71 +310,109 @@ school graduates aged 25 to 34 in the state for undergraduate programs;
 bachelor's holders in the field for graduate programs). Below it:
 `earnings_test = "Fail"`.
 
-## Exercise 4: daydream
+## The tables in `data/`
 
-Pick one; add a section to your report. Code for six of them is in
-`solutions/04_daydream_examples.qmd`.
+| File | One row per | Use for |
+|---|---|---|
+| `ppd_programs.rds` | program | today: earnings, debt, benchmark, pass/fail, demographics |
+| `ppd_yearly.rds` | program × award year | 2015-16 to 2024-25: enrollment, completers, Pell, loans |
+| `ppd_cip6_earnings.rds` | program at 6-digit CIP | the earnings detail the official file will use |
+| `institutions.csv` | institution | find a UNITID; compare institutions |
+| `codebook.csv` | column | every column, what it means, where it came from |
 
-Who is within 10% of the line, either side. Which benchmark each program
-was held to. Ten years of Pell share. Loan volume by year, Parent PLUS vs
-Grad PLUS. Non-completion by program, trended. Debt against earnings, one
-point per program. The same program at five peers. Pass and fail across
-your whole state by control. Completer demographics against results.
-Delinquency and default for the one cohort that has it. Your programs at
-6 digits. The one-page Typst brief for the provost.
+# Exercise 3: the room, one click
 
-# Asking an AI, safely
+1. Open `exercises/03_render_peers.R`. The list is the ten institutions
+   in this room, with UNITIDs.
+2. Click **Source**. Ten reports appear in `output/`.
+3. Edit the list. Change `format` to `"typst"` if you want PDFs. Source
+   again.
+
+This is the whole trick behind one-PDF-per-college, one-report-per-
+department, one-profile-per-program. The template does not know how many
+there are.
+
+## If it breaks
+
+| Message | Means |
+|---|---|
+| `No programs found for unitid` | typo, or your campus reports under a parent OPEID; search `institutions.csv` by name |
+| `could not find function` | a package is not loaded; add `library(...)` in the setup chunk |
+| `object 'x' not found` | a chunk above did not run; Render runs them in order from the top |
+| the PDF table is cut off | shorten column labels or drop a column; or keep it HTML-only |
+
+{{< pagebreak >}}
+
+# Exercise 4: improve it with an AI
 
 ```{=typst}
 #block(width: 100%, inset: 10pt, fill: rgb("#FFF4EC"), stroke: 1pt + rgb("#E87722"), radius: 4pt)[
   #text(weight: "bold", size: 12pt)[The rule: share the shape of the data, never the rows.]
   #v(0.4em)
-  Column names, types, a description, the codebook: yes. Student records: never. Small aggregates can identify people: think first. Passwords and keys: never. \
-  Today's dataset is public and has no student-level data, so you may paste rows from it. That is the exception. Your warehouse is not like this.
+  Column names, types, the codebook, your code: yes. Student records: never. Small aggregates can identify people: think first. Passwords and keys: never. \
+  Today's data set is public and has no student-level rows, so you may paste from it. That is the exception. Your warehouse is not like this.
 ]
 ```
 
-## Prompt 1: describe, then ask
+Use whatever assistant you have: ChatGPT, Claude, Copilot, Gemini.
 
-> I am writing a Quarto report in R using dplyr, ggplot2 and gt. I have a
-> data frame `tested`, one row per academic program, with these columns:
-> *[paste lines from codebook.csv]*. Write one R chunk that *[what you
-> want]*. Use `theme_minimal()`. Do not install packages. Return only the chunk.
+## The move
 
-## Prompt 2: the error
+1. Open `02_my_institution.qmd`. Select a chunk, or the whole file. Copy.
+2. In the assistant, paste it and ask for **one** change:
 
-> Here is my R chunk: *[chunk]*. Here is the error: *[the red text]*. What
-> is wrong and what is the fix?
+> Here is a chunk from a Quarto report in R: *[paste]*. Change it so that
+> *[one thing]*. Return only the chunk.
 
-## Prompt 3: make it say something
+3. Paste the result back over the old chunk. Render.
+4. If it fails: "Here is the chunk: *[paste]*. Here is the error:
+   *[paste the red text]*. Fix it."
 
-> Here is a table of results: *[5 to 15 rows]*. Write three sentences for a
-> provost that state the main finding plainly, with no adjectives, and
-> name the one program that most needs attention.
+## Pick one thing, then another
 
-Treat the answer as a draft. Check every number.
+- Change the chart colors to my institution's colors (give two hex codes).
+- Make the margin chart bars sorted the other way.
+- Add a column to the test table showing the margin as a percent.
+- Add a bar chart of Pell recipients by year under the enrollment chart.
+- Add a section at the end with one sentence summarizing the results.
+- Make the at-a-glance table two columns side by side instead of a list.
 
-## Prompt 4: the report you actually owe someone
+Each one is five minutes. Finished examples of several are in
+`solutions/improvement_examples.qmd`.
 
-> I produce *[report]* for *[audience]* every *[cadence]*. Today I build it
-> in *[tool]* by *[steps]*. The data has these columns: *[names and types,
-> no rows]*. Outline a Quarto document that produces it, with a parameter
-> for *[what changes each time]*, and list the chunks I would need.
+## When it answers
 
-## What the assistant is good and bad at
+Read the code before you paste it. The assistant produces confident code
+that runs and is wrong. Rendering is the first test; reading the number is
+the second.
 
-Good: syntax you forgot, a first draft of a chunk, explaining an error,
-turning a table into sentences, suggesting a chart. Bad: knowing your
-data, knowing your rules, arithmetic you did not check, anything it cannot
-see. It will produce confident code that runs and is wrong. Rendering is
-the test; reading is the second test.
+# Exercise 5: the report you actually owe someone
 
-## With an API key (optional)
+Everything so far used our data. This one uses the shape of yours. Think
+of one report you produce over and over. Not the hardest; the most
+annoying.
 
-The `ellmer` package calls a model from an R chunk, so a summary paragraph
-can be written at render time. Costs money per call. Key in `keyring`,
-never in a file. Same rule applies: whatever is in the data frame you pass
-leaves the building.
+1. Write down its column names and types. Not the data. The names. The
+   primer's "shape of your data" page has the one-liner for wherever it
+   lives: `DESCRIBE` in Oracle, `INFORMATION_SCHEMA` in Snowflake, the
+   Database Documenter in Access, `read_excel(n_max = 0)` for a workbook,
+   or `shape_of()` in `setup/02_shape_of_my_data.R` for anything already
+   in R. You can also ask the assistant to write the metadata query; that
+   prompt holds nothing sensitive.
+2. In the assistant:
+
+> I produce *[report]* for *[audience]* every *[cadence]*. Today I build
+> it in *[Excel / Access / SPSS]* by *[the steps]*. The data has these
+> columns: *[names and types, no rows]*. Outline a Quarto document that
+> produces it, with a parameter for *[the thing that changes each time]*,
+> and write the first two chunks.
+
+3. Make a new file, `my_report.qmd`, in the exercises folder. Paste the
+   outline in. Copy the YAML header from `02_my_institution.qmd` on top.
+4. Render it with no data. Headings and empty chunks are a plan you can
+   take home.
+
+At 11:15 we will put a few plans on the screen.
 
 # Cheat sheet, and taking it home
 
@@ -411,6 +440,7 @@ execute:
 #| label: name          # unique; shows in Render progress
 #| fig-height: 4
 #| echo: true           # show this one chunk's code
+#| eval: false          # show the code, do not run it
 ```
 
 ## Markdown you will use
@@ -426,9 +456,7 @@ quarto::quarto_render("report.qmd", execute_params = list(unitid = 100858),
                       output_file = "Auburn.html")
 ```
 
-## Connect to your own warehouse (desktop only, at home)
-
-Not in Posit Cloud. See the note under Door 2.
+## Connect to your own warehouse (at home)
 
 ```r
 con <- DBI::dbConnect(odbc::odbc(), dsn = "MY_DSN",
@@ -451,8 +479,7 @@ Department's files. Change it; every report re-renders.
 
 | | |
 |---|---|
-| This project | `[REPO LINK]` |
-| Posit Cloud space | `[SPACE LINK]` |
+| This project | github.com/AuburnClaire/IR-Quarto-Workshop |
 | PPD:2026 source files | ed.gov, Negotiated Rulemaking 2025-2026, AHEAD Session 2 materials |
 | Quarto | quarto.org/docs/guide |
 | R for Data Science, free | r4ds.hadley.nz |

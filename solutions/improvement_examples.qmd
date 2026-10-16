@@ -1,6 +1,6 @@
 ---
-title: "Daydream examples"
-subtitle: "Five sections you could add to your report, with the code"
+title: "Improvement examples"
+subtitle: "Sections an AI can add to your report, with the code"
 date: today
 format:
   html:
@@ -15,7 +15,7 @@ execute:
   message: false
 ---
 
-Each section below is one answer to a question in `exercises/04_daydream.md`.
+Each section below is one improvement you could ask an AI for in exercise 4.
 The code is folded; click "Show the code". Copy a section into your own
 report and change it.
 

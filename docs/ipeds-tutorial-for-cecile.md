@@ -1,7 +1,7 @@
 # IPEDS, one question at a time: a Quarto pattern
 
 *A starting point for Cecile. The template that goes with this is
-`templates/ipeds/EF_fall_enrollment.qmd`; it renders on fake data so the
+`solutions/ipeds_full_template.qmd`; it renders on fake data so the
 shape is visible before any real table is involved.*
 
 ## The idea
@@ -22,6 +22,56 @@ year changed and you get next year's.
 
 This is what the Access-to-Oracle ports in IR-SQL already do for ACHE and
 the feedback reports, applied to the survey that has the most questions.
+
+## SQL first; R is the wrapper
+
+Most of the code is SQL. R's job is to hand the SQL to the database, catch
+the result, and either show it or test it. A chunk looks like this:
+
+````
+```{r}
+#| label: error-dept
+#| echo: false
+
+qry <- "
+  SELECT academic_period, id, program, degree_code, college, dept, major
+    FROM my_schema.degrees_prelim
+   WHERE dept IS NULL OR dept = ''
+"
+error_dept <- dbGetQuery(con, qry)
+
+if (nrow(error_dept) == 0) {
+  cat("No department errors.\n")
+} else {
+  error_dept
+}
+```
+````
+
+Four lines of R around a query you already know how to write. The SQL is
+the rule; the `if` is the check; the rendered document shows either a
+reassuring sentence or the rows that need fixing. A file of thirty of these
+is a nightly error report, and the same file with counting queries is a
+survey.
+
+Two other ways to write the same thing, for when they help:
+
+- **A SQL chunk.** Quarto lets you write the query without the quotes:
+  ````
+  ```{sql connection=con, output.var="error_dept"}
+  SELECT ... FROM my_schema.degrees_prelim WHERE dept IS NULL
+  ```
+  ````
+  The result lands in an R object named by `output.var`, and the next R
+  chunk tests it. Syntax highlighting works, and the query is visibly SQL
+  on the page.
+- **dbplyr**, which lets you write dplyr and has it generate the SQL. Good
+  for people who think in dplyr. Unnecessary for people who think in SQL.
+
+For an IPEDS file, the SQL does the heavy lifting in the population query
+(below), and the per-question chunks are short counting queries against
+the population, or short dplyr against the population data frame.
+Whichever the author reads faster.
 
 ## The shape of one survey file
 
@@ -61,8 +111,10 @@ order:
 The temptation is one query per question, each with its own `WHERE`. The
 pattern that holds up is one query that builds the **population** for the
 survey (every student who could count, with every column any question
-needs), then each question filters and counts that population in R. Two
-reasons:
+needs), then each question filters and counts that population. The
+per-question step can be SQL against a temporary table, or dplyr against
+the data frame the population query returned; same result. Two reasons
+for the split:
 
 - Every question is guaranteed to be counting the same students. When the
   Part A total and the Part B total disagree, it is a rule difference, not
@@ -119,12 +171,16 @@ and the prior-year comparison all follow.
 The assistant is good at exactly the step that is tedious: turning a
 question and a column list into a chunk. The prompt that works:
 
-> I am building an IPEDS Fall Enrollment submission as a Quarto document
-> in R. I have a data frame `pop`, one row per enrolled student on census
-> day, with these columns: [names and types, no rows]. Write one R chunk
-> using dplyr that answers this question: "[paste the IPEDS question text]".
-> Return a small data frame with the columns [what the upload needs]. Add
-> a comment stating the rule you applied. Do not install packages.
+> I am building an IPEDS Fall Enrollment submission as a Quarto document.
+> I have a table `population`, one row per enrolled student on census day,
+> with these columns: [names and types, no rows]. Write one Oracle SQL
+> query that answers this question: "[paste the IPEDS question text]".
+> Return one row per [race, gender] with a count. Add a comment stating the
+> rule you applied.
+
+Or the same prompt asking for "one R chunk using dplyr against a data frame
+`pop`" if you would rather have dplyr. Ask for whichever you can read
+fastest, because you are going to read it carefully.
 
 Then read the comment. The assistant will state its interpretation of the
 rule, and that is where the IR judgment goes: is "first-time" the IPEDS

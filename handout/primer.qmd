@@ -1,6 +1,6 @@
 ---
 title: "R, Python, and Quarto"
-subtitle: "A primer for people who will stand in front of a room, and for the room"
+subtitle: "A primer for IR professionals with diverse familiarity with these languages"
 author: "Auburn University Office of Institutional Research"
 date: today
 date-format: "MMMM YYYY"
@@ -175,6 +175,7 @@ and getting it right costs nothing.
 | Markdown | as written | |
 | Pandoc | "PAN-dock" | |
 | Typst | "TIPST", one syllable | |
+| LaTeX | "LAH-tek" or "LAY-tek" | both are accepted; the X is a Greek chi, so never "lay-tex" like the glove. TeX alone is "tek" |
 | knitr | "NIT-er" | the R chunk engine |
 | dplyr | "dee-PLY-er" | "data pliers" |
 | tidyr | "TIDY-er" | |
@@ -263,6 +264,78 @@ Five `dplyr` verbs do most of the work:
 With `group_by()` to set the grouping before `summarise()`, and `left_join()`
 to join. If you know SQL, you already know dplyr; the words are different and
 the order is the order you think in.
+
+## If you would rather just write SQL
+
+You can. Many IR people use R as a wrapper around the SQL they already
+write, and that is a complete way to work. Three forms, same result:
+
+```r
+# 1. The query in a string, handed to the database. The common one.
+qry <- "SELECT level, COUNT(*) AS n FROM my_schema.population GROUP BY level"
+by_level <- DBI::dbGetQuery(con, qry)
+```
+
+```{{sql connection=con, output.var="by_level"}}
+-- 2. A SQL chunk: no quotes, syntax highlighting, result lands in by_level.
+SELECT level, COUNT(*) AS n FROM my_schema.population GROUP BY level
+```
+
+```r
+# 3. dplyr that writes the SQL for you and runs it in the database.
+by_level <- tbl(con, in_schema("my_schema", "population")) |>
+  count(level) |> collect()
+```
+
+After any of the three, `by_level` is a data frame and the rest of this
+document applies: `gt()` to show it, `ggplot()` to chart it, `stopifnot()`
+to test it. The R you need is about ten lines, and they are all on this
+page.
+
+## Coming from Access, by way of Oracle
+
+Cecile's notes from moving the IPEDS work out of Access, through Oracle
+SQL Developer, into Quarto. The same three stops most IR offices make.
+
+**Syntax that changes.** Each of these will bite once.
+
+| Access | Oracle SQL | R / Quarto |
+|---|---|---|
+| `TRANSFORM ... PIVOT` crosstab query | `PIVOT (...)` clause, or `GROUP BY` and pivot afterward | `pivot_wider()`; `pivot_longer()` for the reverse |
+| `IIf(cond, a, b)` | `CASE WHEN cond THEN a ELSE b END` | `if_else(cond, a, b)`; `case_when()` for several |
+| wildcards `*` and `?` | `%` and `_` | `str_detect()` with a pattern; `LIKE` inside your SQL |
+| strings in `"double quotes"` | strings in `'single quotes'` | either, but SQL inside an R string uses single quotes so the R string can use double |
+| `[Enter a term]` prompt | `:term` bind variable | `params$term` |
+| `Nz(x, 0)` | `NVL(x, 0)` or `COALESCE` | `coalesce(x, 0)`; `replace_na()` |
+| `Format(d, "yyyy")` | `TO_CHAR(d, 'YYYY')` | `year(d)` from lubridate |
+| `Left(s, 3)` | `SUBSTR(s, 1, 3)` | `str_sub(s, 1, 3)` |
+
+**Parameters.** In Access a prompt is typed each time and is not
+reusable. In Oracle a bind variable is reusable logic, but each query
+asks for its own value. In Quarto a parameter is defined once at the top
+of the document and every chunk reads it; a file path can be a parameter
+too, so the same document can run against this year's extract or last
+year's.
+
+**Comments.** Access keeps a query's description in a properties box,
+hidden and small. Oracle has `--` comments in the SQL. Quarto has comments
+in the code and ordinary prose outside the chunk, which is where the
+explanation that matters goes: what this question asks, what rule was
+applied, what to watch for. The comment becomes documentation without
+being retyped anywhere.
+
+**Time.** Her measurements, not estimates.
+
+| | Access | Oracle | R / Quarto |
+|---|---|---|---|
+| One IPEDS component | 30 minutes to several hours | 5 to 15 minutes | up to 5 minutes |
+| How many queries | about 30, run one by one | about 10 condensed, one by one unless in one script | about 10, all run together with the reporting |
+| Failure mode | stalls on queries returning thousands of rows, and again when copying the results | | |
+| What you have at the end | numbers in a spreadsheet, typed into the portal | numbers on screen | the numbers, the queries, the explanation, and the upload file in one rendered document |
+
+The hours did not go away because the computer got faster. They went
+away because thirty separate things became one thing that runs top to
+bottom and records its own output.
 
 ```{r}
 #| echo: true
@@ -549,6 +622,66 @@ switches between source and a Word-like view. Tables, citations, and images
 are easier there. Everything it does is saved as plain Markdown underneath,
 so nothing is lost by switching.
 
+# The shape of your data, without the data
+
+Every prompt in this workshop says "column names and types, not rows."
+Here is how to get that from wherever your data lives, in one line each.
+The output of every one of these is safe to paste into an assistant, with
+one check: read it first, because a column *named* `ssn` is itself a
+fact, and a DDL export can carry default values or comments with examples
+in them.
+
+## Databases
+
+| Where | What to run | Gives |
+|---|---|---|
+| Oracle, SQL Developer | `DESCRIBE my_schema.my_table` | columns, types, nullable |
+| Oracle, any client | `SELECT column_name, data_type, data_length, nullable FROM all_tab_columns WHERE owner = 'MY_SCHEMA' AND table_name = 'MY_TABLE' ORDER BY column_id` | the same, as rows you can save |
+| Oracle, comments | `all_tab_comments`, `all_col_comments` | the documentation someone once wrote |
+| Oracle, the whole definition | `SELECT DBMS_METADATA.GET_DDL('TABLE', 'MY_TABLE', 'MY_SCHEMA') FROM dual` | the CREATE statement; same for `'VIEW'`, `'PACKAGE'` |
+| Oracle, what feeds what | `all_dependencies`, `all_constraints`, `all_views` (column `text`) | lineage, keys, view SQL |
+| Snowflake | `DESCRIBE TABLE my_db.my_schema.my_table`; `SHOW COLUMNS IN TABLE ...`; `SELECT GET_DDL('TABLE', '...')` | same ideas, Snowflake spelling |
+| Snowflake, everything at once | `SELECT * FROM my_db.INFORMATION_SCHEMA.COLUMNS WHERE table_schema = 'MY_SCHEMA'` | one row per column for a whole schema |
+| SQL Server | `sp_help 'my_table'`; `INFORMATION_SCHEMA.COLUMNS` | |
+| Any database, from R | `DBI::dbListTables(con)`; `DBI::dbListFields(con, "my_table")` | names only |
+| Any database, from R | `DBI::dbGetQuery(con, "SELECT * FROM my_table WHERE 1 = 0")` | the columns with zero rows; `str()` it |
+| Any database, in RStudio | the **Connections** pane | click to expand schemas, tables, columns |
+
+## Access
+
+| What to run | Gives |
+|---|---|
+| Database Tools, **Database Documenter**, pick objects, uncheck the data options | a report of every table, field, type, and query SQL |
+| In any query, View, **SQL View** | the query's SQL, to copy |
+| A short VBA loop over `CurrentDb.TableDefs` and `QueryDefs` writing names, fields and `.SQL` to a text file | the whole database's logic as plain text. This is what Auburn did before porting. Ask an assistant to write the loop; the prompt contains nothing sensitive. |
+
+## Files and folders
+
+| Where | What to run | Gives |
+|---|---|---|
+| A CSV | `readLines("file.csv", n = 1)` | the header row only |
+| An Excel workbook | `readxl::excel_sheets("f.xlsx")`; `readxl::read_excel("f.xlsx", n_max = 0)` | sheet names; column names with no rows |
+| A SAS or SPSS file | `haven::read_sas("f.sas7bdat", n_max = 0)` | columns and labels, no rows |
+| A folder | `fs::dir_tree("path")`; `list.files("path", recursive = TRUE)` | the structure |
+| A folder, Windows | `dir /s /b > files.txt` in a command prompt; or PowerShell `Get-ChildItem -Recurse \| Select Name, Length, LastWriteTime \| Export-Csv files.csv` | every file with size and date |
+| A data frame in R | `str(df)`; `dplyr::glimpse(df)`; `sapply(df, class)` | names and types; `glimpse` shows the first values, so look before pasting |
+| A data frame in R, nothing but shape | `shape_of(df)` from `setup/02_shape_of_my_data.R` | names, types, missing, distinct, no values |
+| A data frame in Python | `df.dtypes`; `df.info()` | |
+| A Qualtrics survey | the survey export as QSF, or `qualtRics::survey_questions()` | questions and types, no responses |
+| A dashboard | Qlik data model viewer; Power BI model view; Tableau data source tab | the fields it uses |
+
+## The trick behind the tricks
+
+You can ask the assistant to write the metadata query. "Write an Oracle
+query that lists every column, type and comment for the tables in schema
+X" contains nothing but a schema name. Run what it gives you, read the
+result, paste the result. The assistant then knows your data's shape as
+well as you do, and has never seen a row.
+
+Keep the result. A text file with table, column, type, and one line of
+meaning is the data dictionary most offices never get around to writing,
+and once it exists every future prompt starts by pasting it.
+
 # Where am I? Working directories and paths
 
 The single most common first-day failure is "cannot open file". The cause
@@ -591,7 +724,7 @@ cd exercises                        # down one folder
 cd ..                               # up one folder
 pwd                                 # where am I (print working directory)
 ls                                  # what is here (dir on Windows cmd)
-quarto render 01_my_institution.qmd
+quarto render 02_my_institution.qmd
 ```
 
 Tab completes names. Up arrow recalls the last command. That is all the
@@ -825,6 +958,28 @@ shows column types, never converts strings to factors.
 to visual properties, drawn with geometric objects, on scales, in a
 coordinate system. Learn the six parts once and every chart is a
 combination of them.
+
+# Two things that exist, and we did not cover
+
+**Shiny: interactive dashboards.** A Quarto report is fixed once rendered.
+When the reader needs to pick a term, a college, a cohort, and see the
+page change, that is Shiny, an R package from Posit for interactive web
+apps. The same `dplyr` and `ggplot2` code goes inside it; what changes is
+that the reader's clicks become inputs. It needs a server to run on
+(Posit Connect, Shiny Server, or shinyapps.io), which is the cost. Two
+lighter paths: Quarto's `dashboard` format gives a dashboard layout
+without a server, and **Shinylive** runs small Shiny apps inside a static
+web page with no server at all. Enrollment dashboards, data-request
+intake forms, and "what if" tuition models are the usual IR uses. Start at
+shiny.posit.co.
+
+**Posit Cloud: RStudio in a browser.** The same RStudio, hosted by Posit,
+with nothing to install. Useful for teaching and for trying things on a
+machine you cannot install software on. It is a hosted service on servers
+your institution does not control, with no FERPA agreement unless your
+institution has made one, so it is not a place for student records.
+Everything in this workshop runs on your own laptop for that reason.
+posit.cloud, free tier available.
 
 # Where to go next
 

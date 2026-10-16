@@ -1,122 +1,164 @@
-﻿# Workshop outline and speaker notes
+# Workshop outline and speaker notes
 
 *Using AI and Quarto to Transform Higher Education Data Workflows.*
-Planned for 3:00; the slot is 3:30, so there is slack. Projector needed
-for the three live segments.
+SAIR 2026, pre-conference workshop A04. Saturday, October 24, 2026,
+8:30 to 11:30 a.m., Izard room, Statehouse Convention Center, Little Rock.
+Three hours. Projector needed.
 
-| Time | Segment | Who | Screen | Handout |
-|---|---|---|---|---|
-| 0:00 | Two doors, same room | both circulate | the cloud link, large | |
-| 0:15 | Why: the production model problem; the landscape; the Auburn story | Claire | slides or talk | |
-| 0:35 | The toolbox tour, live in RStudio | Claire | RStudio | |
-| 0:55 | IPEDS submission, question by question | Cecile | RStudio | |
-| 1:10 | Break | | | |
-| 1:20 | Hands-on: the STATS report, exercises 1 to 4 | both circulate | exercise steps | |
-| 2:10 | AI, safely: the rule, two live prompts, then everyone | Claire | browser + RStudio | |
-| 2:40 | Share-out and Quarto Pub | volunteers | their reports | |
-| 2:55 | Take it home | both | | |
+| Clock | Segment | Who | Exercise |
+|---|---|---|---|
+| 8:30 | Getting everyone in | both circulate | 0 |
+| 8:45 | Overview: why, the landscape, the Auburn story, the toolbox tour | Claire | |
+| 9:15 | One IPEDS question | Cecile | 1 |
+| 9:35 | Your institution's report from the federal data | Claire | 2 |
+| 10:00 | Break | | |
+| 10:10 | The room's institutions, one click | Claire | 3 |
+| 10:25 | Improve it with an AI | Claire | 4 |
+| 10:55 | The report you owe someone | both | 5 |
+| 11:15 | Share-out and take it home | both | |
 
-## 0:00 Two doors (15 min)
+## 8:30 Getting everyone in (15 min)
 
 Say once, then stop talking: "If your check script said Ready, open
 `exercises/00_hello.qmd` and click Render. Then go straight to exercise 1
-in the handout. If it did not, raise a hand or open the cloud link on the
-board." Fast people never wait. You and Cecile take the hands.
+in the handout. If it did not, raise a hand." Fast people never wait. You
+and Cecile take the hands.
 
 Common fixes: project not opened (double-click the .Rproj); packages not
-installed (Source the install script, it takes minutes); R too old; locked
-laptop (cloud).
+installed (Source the install script, it takes minutes); R too old. A
+truly locked laptop: pair them with a neighbor for the morning, and they
+leave with the pre-rendered report for their institution.
 
-## 0:15 Why (20 min)
+## 8:45 Overview (30 min)
 
-Three beats.
+Five minutes of why, fifteen of show-and-tell, ten of tour, all on the
+projector.
 
-1. **More reports, same staff.** Everyone nods.
-2. **The landscape**. Spreadsheets and Access: where most
-   of us are. BI tools: dashboards, not documents. Stats packages: stop at
-   the number. Notebooks: fine, and Quarto renders them too. We chose
-   RStudio because it is free, stable, Quarto comes inside it, and the IR
-   community is here. Posit Cloud because nothing to install.
-3. **The Auburn story.** Twenty years of Access. The logic was read out
-   into plain-language rules, re-implemented, and the old and new were run
-   on the same cohort and compared figure by figure. The comparison found
-   three bugs the Access report had carried for years. Say the principle:
-   *the logic is readable, the data never is.* Everything today follows
-   from it.
+**Why (5 min).** More reports, same staff. The landscape (handout):
+spreadsheets and Access, where most of us are; BI tools, dashboards not
+documents; stats packages, stop at the number; notebooks, fine, and Quarto
+renders them too. We chose RStudio because it is free, stable, Quarto
+comes inside it, and the IR community is here. Posit Cloud in one
+sentence: exists, hosted outside the institution, not used today.
 
-## 0:35 Toolbox tour (20 min)
+**What Auburn built (15 min).** Three projects, shown from your screen,
+not distributed. Open each rendered file locally before the session so
+nothing depends on wifi or sign-in. In this order, because the first is
+the headline:
 
-Live, not slides. In order:
+1. **High school feedback reports (6 min).** The before: one Access
+   report printed as a single PDF of 3,500-plus pages, cut by hand into
+   360-plus files, each named by hand, every year. The after: one Quarto
+   template, one parameter, a loop, 360 PDFs with the right names in one
+   run. Show one PDF, then the folder of them. Then say what carried
+   over: the rules were read out of the Access logic and written down
+   before a line was re-implemented, and the old and new were run on the
+   same year and compared figure by figure. (The transfer reports got the
+   same treatment and the comparison found three errors the Access
+   report had carried for years; one sentence, if at all.)
+2. **Parent portal retention (4 min).** On ir-reports.auburn.edu, or the
+   HTML saved locally. A Quarto HTML report for Student Affairs, behind
+   campus sign-in, visible only to the people whose role allows it. The
+   point: the same tool that made the PDFs makes a web page, and the
+   portal decides who sees it.
+3. **College of Agriculture major changes (5 min).** The heatmaps. A
+   rolling ten-cohort window that advances by itself each August; the
+   "about the data" box that states the cohort range and is generated,
+   not typed. The point: a report that updates itself and documents
+   itself.
+
+Close the three with the principle: *the logic is readable, the data
+never is.* Everything they just saw is plain text in a repository; the
+students are in Oracle, read at render time.
+
+**The tour (10 min), live in RStudio:**
 
 - Open the project. Panes: editor, console, environment, files.
-- Open `00_hello.qmd`. Render. Then click Source, then Visual, and say
-  the line: people write in Visual, AI writes Source, same file. Then
-  Run one chunk with the green arrow and point out nothing was written to
-  disk; then Render and point at the file. Run is for thinking, Render is
-  for the document, Publish is for the audience.
+- Open `00_hello.qmd`. Render. Click Source, then Visual: people write in
+  Visual, AI writes Source, same file. Run one chunk with the green arrow,
+  nothing written to disk; Render, and point at the file. Run is for
+  thinking, Render is for the document, Publish is for the audience.
 - Change `format: html` to `typst`. Render. "That is a PDF with nothing
-  installed." To `docx`. To `revealjs`.
-- Scroll the handout toolbox page and point: SQL chunk, Python
-  chunk, Connections pane, Git tab, Terminal. Do not demo each; say they
-  exist.
-- Show `01_my_institution.qmd` rendered for Auburn. "This is what you are
-  about to make for your institution."
+  installed."
+- Scroll the handout toolbox page and point: SQL chunk, Python chunk,
+  Connections pane, Git tab, Terminal. Say they exist.
 
-## 0:55 Cecile (15 min)
+## 9:15 Cecile: one IPEDS question (20 min)
 
-Her segment. Suggested shape: one IPEDS question, the Access query that
-answered it, the chunk that answers it now, the number and the query side
-by side in the rendered document. Then the folder of questions. If she
-wants a peer proof point: the `IPEDSuploadables` package, written at Notre
-Dame, is on CRAN.
+Her segment. The headline for the SQL people in the room: **you do not
+have to learn R to do this. R is the wrapper that runs your SQL.**
 
-## 1:20 Hands-on (50 min)
+**Her show-and-tell first (5 min).** What it looks like when she builds
+reporting: a real survey file on her screen, scrolled top to bottom, the
+question sections, the SQL inside the chunks, the rendered page with the
+green "no errors" lines, the upload file at the end. Shown, not
+distributed. The line to land: this is the Access database, as a document
+that runs.
 
-Exercise 1: type the UNITID, render. Budget ten minutes to get everyone
-there; fast people are on exercise 3 by then.
+**Then everyone, hands-on (15 min).** Everyone opens `01_ipeds.qmd` and renders it. On the projector she walks
+the file top to bottom: the data set (a CSV of invented students), the
+question quoted from the form, the rule in words, the chunk, the table.
+Then the last two chunks, not run: the same thing with the data coming
+from a warehouse, and the counting done in SQL instead of dplyr. Her own
+chunk shape, a query in a string and `dbGetQuery()`, is on the handout
+page with the Access-to-Oracle-to-Quarto table.
 
-Exercise 2: formats. Five minutes. Point out the "Every current program"
-section vanishes in PDF, and why (`content-visible`).
+"Try one thing" at the bottom: change the filter and render, which
+answers a different line. The point to land: thirty questions is the same
+file, longer. A full survey with checks and an upload file is in
+`solutions/ipeds_full_template.qmd` for anyone who wants to see it.
 
-Exercise 3: five peers, one click. Let them edit the list.
+## 9:35 The federal data report (25 min)
 
-Exercise 4: daydream. The rest of the block. `solutions/04_daydream_examples.qmd`
-is there for anyone who wants code to copy.
+Exercise 2. Everyone types their UNITID (it is in the email and in a
+comment in the file) and renders. Budget ten minutes to get everyone
+there. Then the last step: change `format` to `typst`, render, a PDF.
+Point out the "Every current program" section vanishes, and why.
 
 Things people will hit: NA is not zero (the data page of the handout); the
 margin chart gets tall for big institutions (change `fig-height`); a
-program with suppressed earnings is "Not tested", not "Pass".
+program with suppressed earnings is "Not tested", not "Pass". Furman and
+Wiley have few tested programs; that is suppression, not absence.
 
-## 2:10 AI, safely (30 min)
+Before the break: Auburn has zero fails. Three institutions in the room
+have failing programs. The data is public, but nobody's goes on the
+projector uninvited.
 
-Say the rule and why this dataset is the exception. Then, on the
-projector:
+## 10:10 The room, one click (15 min)
 
-1. Prompt 1 live. Paste five codebook lines and ask for a chunk that
-   charts Pell share by year. Paste the chunk in. Render. If it fails,
-   that is better: do Prompt 2 live.
-2. Prompt 3 live. Paste the at-glance table, ask for three sentences for
-   a provost. Read the result critically out loud. Check one number.
+Exercise 3. The list in `03_render_peers.R` is the room. Click Source,
+ten reports in `output/`. Let them edit the list. This is the whole
+trick behind one-PDF-per-college and one-profile-per-program.
 
-Then everyone: twenty minutes to extend their own report with one
-AI-written section.
+## 10:25 Improve it with an AI (30 min)
 
-Optional, if time and if you have a key: the `ellmer` chunk that writes
-the summary paragraph at render time. Show the key coming from `keyring`.
+Exercise 4. Say the rule: share the shape of the data, never the rows,
+and why today's data is the exception. Then on the projector, once:
+copy a chunk from exercise 2, paste it into an assistant, ask for one
+change from the list, paste the result back, render. If it fails, paste
+the error back. That is the whole move.
 
-## 2:40 Share-out (15 min)
+Then everyone does it, twice. Keep the asks small: colors, one more
+chart, one more column, one summary sentence.
+`solutions/improvement_examples.qmd` has finished versions.
 
-Three or four volunteers. Anyone who wants to publish: in the Terminal,
-`quarto publish quarto-pub exercises/01_my_institution.qmd`. Public data,
-so it is safe. Links go in the shared doc.
+## 10:55 The report you owe someone (20 min)
 
-## 2:55 Take it home (5 min)
+Exercise 5. Column names, not data, into the assistant, with the prompt
+on the handout. Out comes an outline and two chunks. A new file, render it
+empty, headings and all. That is a plan they take home. Circulate; this is
+where the real questions come out.
 
-- Desktop vs cloud when you connect to your own warehouse: desktop, and
-  say why. Posit Cloud is a hosted service on AWS with no FERPA statement
-  we could find and no agreement with their institution unless they made
-  one. It was right for today because today's data is public. Student
-  records never go there without the institution's own review. The `DBI`
-  and `odbc` packages are installed; `keyring` for the password.
+## 11:15 Share-out and take it home (15 min)
+
+Three or four volunteers, chosen by asking, never by pointing. Then:
+
+- Connecting to your own warehouse: everything stays on your machine,
+  which is the point. The `DBI` and `odbc` packages are installed;
+  `keyring` for the password. If anyone asks about Posit Cloud: hosted on
+  AWS, no FERPA statement we could find, no agreement with their
+  institution unless they made one, so student records never go there
+  without the institution's own review.
 - February 2027: the ingest script is the one file that changes.
-- The repo link, the white paper, our emails.
+- The repo: github.com/AuburnClaire/IR-Quarto-Workshop. The white paper.
+  Our emails.

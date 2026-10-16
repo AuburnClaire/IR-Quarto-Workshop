@@ -27,8 +27,8 @@ Open the project folder and confirm three things:
    another name and it is ignored.
 3. Nothing in the folder names a DSN, a share, a schema, a password, or a
    person who is not an author. (Swept on October 11; sweep again after
-   any edit: in the Terminal, `git grep -i -E "banprod|auo7|keyring::key_"`
-   once the repo exists.)
+   any edit: in the Terminal, `git grep -i -E "your DSN name|your share name|keyring::key_"`
+   with the real names typed in, once the repo exists.)
 
 ## Step 1: the account
 

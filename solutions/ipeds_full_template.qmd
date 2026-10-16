@@ -51,22 +51,14 @@ add_rows <- function(part, line, df) {
 ```
 
 ::: {.callout-important title="This is a template on fake data"}
-The population chunk below invents 3,000 students so the document renders
-anywhere. To use it, replace that one chunk with the population query
-against your warehouse (an example is in the chunk after it, not run).
-Every question section stays exactly as it is.
+The population chunk below invents 3,000 students so the document renders anywhere. To use it, replace that one chunk with the population query against your warehouse (an example is in the chunk after it, not run). Every question section stays exactly as it is.
 :::
 
 # The population
 
-One query builds every student who could count for this survey, with every
-column any question needs. The questions never touch the database; they
-filter this.
+One query builds every student who could count for this survey, with every column any question needs. The questions never touch the database; they filter this.
 
-**Rule.** Students enrolled for credit as of the fall census date
-(`r params$census_term`). One row per student. Columns are IPEDS
-categories, not Banner codes: the mapping from codes to categories happens
-here, once, and nowhere else.
+**Rule.** Students enrolled for credit as of the fall census date (`r params$census_term`). One row per student. Columns are IPEDS categories, not Banner codes: the mapping from codes to categories happens here, once, and nowhere else.
 
 ```{r}
 #| label: population-fake
@@ -125,15 +117,10 @@ tibble(What = c("Students in the population", "Undergraduate", "Graduate", "Firs
 # Part A, line 1: full-time first-time degree-seeking undergraduates
 
 ::: {.callout-note title="IPEDS asks"}
-**Part A, Line 1.** Full-time, first-time degree/certificate-seeking
-undergraduate students, by race/ethnicity and gender.
+**Part A, Line 1.** Full-time, first-time degree/certificate-seeking undergraduate students, by race/ethnicity and gender.
 :::
 
-**Rule.** Undergraduate level; attending full-time (12 or more credit
-hours); first-time as IPEDS defines it (no prior postsecondary enrollment
-after high school, with the summer-start exception applied in the
-population query); degree-seeking. Counted once each, in the race category
-from the population.
+**Rule.** Undergraduate level; attending full-time (12 or more credit hours); first-time as IPEDS defines it (no prior postsecondary enrollment after high school, with the summer-start exception applied in the population query); degree-seeking. Counted once each, in the race category from the population.
 
 ```{r}
 #| label: ef-a-1
@@ -150,12 +137,10 @@ add_rows("A", "1", a1 |> pivot_longer(c(Men, Women), names_to = "gender", values
 # Part A, line 7: all full-time undergraduates
 
 ::: {.callout-note title="IPEDS asks"}
-**Part A, Line 7.** Total full-time undergraduate students, by
-race/ethnicity and gender.
+**Part A, Line 7.** Total full-time undergraduate students, by race/ethnicity and gender.
 :::
 
-**Rule.** Undergraduate level; full-time. First-time or not, degree-seeking
-or not. Line 1 is a subset of this line, which the checks section verifies.
+**Rule.** Undergraduate level; full-time. First-time or not, degree-seeking or not. Line 1 is a subset of this line, which the checks section verifies.
 
 ```{r}
 #| label: ef-a-7
@@ -172,13 +157,10 @@ add_rows("A", "7", a7 |> pivot_longer(c(Men, Women), names_to = "gender", values
 # Part B: enrollment by age
 
 ::: {.callout-note title="IPEDS asks"}
-**Part B.** Enrollment by age category, attendance status, and level.
-(Required in odd-numbered years.)
+**Part B.** Enrollment by age category, attendance status, and level. (Required in odd-numbered years.)
 :::
 
-**Rule.** Age on the census date, in the IPEDS bands. A student whose age
-is unknown goes in "Age unknown", which the population query would supply
-as NA.
+**Rule.** Age on the census date, in the IPEDS bands. A student whose age is unknown goes in "Age unknown", which the population query would supply as NA.
 
 ```{r}
 #| label: ef-b
@@ -206,8 +188,29 @@ add_rows("B", "all", b |> pivot_longer(-age_band, names_to = "col", values_to = 
 
 # Checks
 
-A submission that does not reconcile should not render. These stop the
-document if they fail.
+A submission that does not reconcile should not render. These stop the document if they fail.
+
+The first check is the SQL-first shape: a query that returns the rows that break a rule, and four lines of R that print a sentence if there are none or the rows if there are. Not run here because there is no database; the population chunk marked `eval: false` above shows the connection.
+
+```{r}
+#| label: check-missing-dept
+#| eval: false
+#| echo: true
+qry <- "
+  SELECT academic_period, id, level_code, dept_code
+    FROM my_schema.fall_census_enrollment
+   WHERE term_code = ? AND (dept_code IS NULL OR dept_code = '')
+"
+missing_dept <- DBI::dbGetQuery(con, qry, params = list(params$census_term))
+
+if (nrow(missing_dept) == 0) {
+  cat("No students without a department.\n")
+} else {
+  stop(nrow(missing_dept), " students have no department; fix in the source before submitting.")
+}
+```
+
+The rest run against the population data frame.
 
 ```{r}
 #| label: checks
@@ -247,9 +250,7 @@ write_csv(upload, out)
 cat(nrow(upload), "cells written to", out, "\n")
 ```
 
-For the portal's key-value format, replace this chunk with the
-`IPEDSuploadables` call for Fall Enrollment, or with `writeLines()` per the
-import specification. Either way the file is a product of the render.
+For the portal's key-value format, replace this chunk with the `IPEDSuploadables` call for Fall Enrollment, or with `writeLines()` per the import specification. Either way the file is a product of the render.
 
 # Appendix: this run
 

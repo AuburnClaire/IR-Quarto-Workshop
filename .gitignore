@@ -14,7 +14,7 @@ PPD-data/cache/
 
 # Rendered output from the exercises (re-render to recreate)
 output/
-templates/ipeds/*_upload.csv
+solutions/*_upload.csv
 *.html
 *.pdf
 *.docx
