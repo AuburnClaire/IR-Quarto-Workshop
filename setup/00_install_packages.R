@@ -67,6 +67,13 @@ kit <- c(
   "ellmer"         # chat with Claude, OpenAI, Gemini, Ollama from R code
 )
 
+# Never try to compile from source. CRAN ships ready-built binaries for
+# Windows and Mac; if a binary for the very newest version is not out yet,
+# this takes the newest one that is, instead of failing for want of Rtools
+# or Xcode. (Rtools matters for installing packages from GitHub or for
+# writing your own; not today.)
+options(install.packages.compile.from.source = "never")
+
 installed <- rownames(installed.packages())
 todo      <- setdiff(kit, installed)
 
@@ -75,11 +82,19 @@ if (length(todo) == 0) {
 } else {
   cat(sprintf("\nInstalling %d package(s): %s\n\n", length(todo), paste(todo, collapse = ", ")))
   install.packages(todo, dependencies = TRUE)
+  # Extras that nothing in the workshop uses. If only these fail, you are fine.
+  optional <- c("tidycensus", "ellmer", "esquisse", "shiny", "leaflet", "plotly",
+                "officer", "flextable", "openxlsx", "haven", "httr2", "styler", "usethis")
   still <- setdiff(kit, rownames(installed.packages()))
   if (length(still) == 0) {
     cat("\nDone. Open setup/01_check_setup.R next.\n\n")
+  } else if (all(still %in% optional)) {
+    cat("\nDone. These extras did not install:", paste(still, collapse = ", "),
+        "\nNothing in the workshop uses them, so you are fine. Open setup/01_check_setup.R next.\n\n")
   } else {
-    cat("\nThese did not install:", paste(still, collapse = ", "),
-        "\nRead the red text above for the reason, or ask us at the workshop.\n\n")
+    cat("\nThese did not install:", paste(setdiff(still, optional), collapse = ", "),
+        "\nThe workshop needs them. Read the red text above for the reason, run this once more,",
+        "\nor ask us at the workshop. (Extras that also failed, which do not matter:",
+        paste(intersect(still, optional), collapse = ", "), ")\n\n")
   }
 }

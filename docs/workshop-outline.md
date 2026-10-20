@@ -41,12 +41,12 @@ renders them too. We chose RStudio because it is free, stable, Quarto
 comes inside it, and the IR community is here. Posit Cloud in one
 sentence: exists, hosted outside the institution, not used today.
 
-**What Auburn built (15 min).** Three projects, shown from your screen,
+**What Auburn built (15 min).** Five projects, shown from your screen,
 not distributed. Open each rendered file locally before the session so
-nothing depends on wifi or sign-in. In this order, because the first is
-the headline:
+nothing depends on wifi or sign-in. In this order, because the first two
+are the headlines and the last three are one point each:
 
-1. **High school feedback reports (6 min).** The before: one Access
+1. **High school feedback reports (5 min).** The before: one Access
    report printed as a single PDF of 3,500-plus pages, cut by hand into
    360-plus files, each named by hand, every year. The after: one Quarto
    template, one parameter, a loop, 360 PDFs with the right names in one
@@ -56,15 +56,27 @@ the headline:
    same year and compared figure by figure. (The transfer reports got the
    same treatment and the comparison found three errors the Access
    report had carried for years; one sentence, if at all.)
-2. **Parent portal retention (4 min).** On ir-reports.auburn.edu, or the
-   HTML saved locally. A Quarto HTML report for Student Affairs, behind
-   campus sign-in, visible only to the people whose role allows it. The
-   point: the same tool that made the PDFs makes a web page, and the
-   portal decides who sees it.
-3. **College of Agriculture major changes (5 min).** The heatmaps. A
-   rolling ten-cohort window that advances by itself each August; the
-   "about the data" box that states the cohort range and is generated,
-   not typed. The point: a report that updates itself and documents
+2. **Faculty salary survey (4 min).** The Access-shaped problem everyone
+   in the room has. Twenty-two years, forty queries run by hand in order,
+   a hire date typed into one each year, last year's table name typed
+   into another, ten report headers edited by hand. Say the line: *about
+   four rules and thirty-five pieces of scaffolding,* and the scaffolding
+   existed because Access cannot group and pivot in one query, hold two
+   years in one table, or remember a date. Now: year is a column, views
+   instead of make-table-then-update so nothing is ever stale, the hire
+   date is computed, one Quarto file prints all ten reports. First run
+   matched the published report to the dollar on 79 of 82 lines. Show the
+   flagship PDF and, if there is time, the ten-row file list.
+3. **Department data packets (2 min).** One PDF per department, the
+   "what stands out" box written by rules from the numbers. The point:
+   one template, one parameter, one loop, and a paragraph nobody had to
+   write sixty times. This is exercise 3 before they have done it.
+4. **Parent portal retention (2 min).** On ir-reports.auburn.edu, or the
+   HTML saved locally. The same tool makes a web page, and the portal
+   decides who sees it.
+5. **College of Agriculture major changes (2 min).** The heatmaps, the
+   rolling ten-cohort window that advances itself each August, the
+   generated "about the data" box. A report that updates and documents
    itself.
 
 Close the three with the principle: *the logic is readable, the data

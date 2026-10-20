@@ -26,6 +26,11 @@ improve it, and sketch the report you actually owe someone.
 5. Open `setup/01_check_setup.R`, click **Source**. It should end with
    "Ready". If it does not, read the FIX lines; we will help at the door.
 
+**Do I need Rtools (or Xcode on a Mac)?** No. Those are compilers, needed
+only to build packages from source. Everything here installs as a
+ready-built binary from CRAN, and the install script never tries to
+compile. If anything ever asks for Rtools, tell us; it should not.
+
 If your laptop will not let you install anything, come fifteen minutes
 early and we will work something out. (A browser-based RStudio exists,
 Posit Cloud, but it is a hosted service outside your institution's control

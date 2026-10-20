@@ -126,6 +126,24 @@ window that advances by itself each August, with an "about the data" box
 that states the cohort range and is generated, not typed. A report that
 updates itself and documents itself.
 
+**Faculty salary survey.** Twenty-two years in Access: about forty saved
+queries run by hand in order, a hire date typed into one of them each
+year, last year's table name typed into another, ten report layouts with
+hand-edited headers. Underneath, about four rules and thirty-five pieces
+of scaffolding that existed because Access cannot group and pivot in one
+query, hold two years in one table, or remember a date. Now four tables
+and fifteen views, year as a column, nothing updated in place, and one
+Quarto file that prints all ten reports with the year as a parameter. On
+the first run it matched the published report to the dollar on 79 of 82
+lines.
+
+**Department data packets.** One PDF per academic department: five years
+of enrollment, degrees, retention, major changes, faculty, teaching,
+grades, applications, in the office's style. A "what stands out" box on
+page two is written by rules from the numbers, so every department gets
+one and nobody writes sixty of them. One template, one parameter, one
+loop.
+
 **IPEDS.** One survey file per component, one section per question, the
 SQL inside the chunks, checks that print "no errors" or the rows, the
 upload file written by the last chunk. The Access database, as a document
