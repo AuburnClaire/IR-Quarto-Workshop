@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Using AI and Quarto to Transform Higher Education Data Workflows"
 subtitle: "Workshop handout"
 author: "Cecile Gleizes and Claire Heacox, Auburn University Office of Institutional Research"
@@ -133,9 +133,7 @@ hand-edited headers. Underneath, about four rules and thirty-five pieces
 of scaffolding that existed because Access cannot group and pivot in one
 query, hold two years in one table, or remember a date. Now four tables
 and fifteen views, year as a column, nothing updated in place, and one
-Quarto file that prints all ten reports with the year as a parameter. On
-the first run it matched the published report to the dollar on 79 of 82
-lines.
+Quarto file that prints all ten reports with the year as a parameter.
 
 **Department data packets.** One PDF per academic department: five years
 of enrollment, degrees, retention, major changes, faculty, teaching,
@@ -146,8 +144,19 @@ loop.
 
 **IPEDS.** One survey file per component, one section per question, the
 SQL inside the chunks, checks that print "no errors" or the rows, the
-upload file written by the last chunk. The Access database, as a document
-that runs.
+upload file written by the last chunk. Produces the Completions section in a single flat file (demo)
+
+**CDS.** Renders the CDS and produces an Excel spreadsheet with a tab for each section
+
+**Surveys.** Various surveys - streamlines all recurring tasks and runs all
+queries in one push of a button. You may spend more time building a Quarto 
+document than it would take to answer your questions for that one year, but 
+you will save time the following year! You can change one variable (year, department, for example)
+and get the result instantly.
+
+**ACHE Credit Hour Production.** State reporting of Credit Hours. Runs the report,
+but also runs error checks. Inserts formulas directly into the spreadsheet. Does two 
+processes in one step - data entry and data clean up and transformation.
 
 ## Three verbs that are not the same thing
 

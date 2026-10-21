@@ -227,9 +227,22 @@ levels), and `Date`.
 
 ## Data frames
 
-A data frame is a table: columns are vectors, all the same length. The
-tidyverse's version is a **tibble**, which prints nicely and never changes
-your types behind your back. Nearly everything in IR work is a data frame.
+A data frame is a table: columns are vectors, all the same length. Nearly
+everything in IR work is a data frame.
+
+**Where things come from, since the names blur together.** Base R, what
+you get with no packages loaded, has the `data.frame`. The **tidyverse**
+is a family of packages that share a style and are installed and loaded
+together with `library(tidyverse)`: `dplyr` (verbs on tables), `tidyr`
+(reshape), `ggplot2` (charts), `readr` (read files), `stringr` (text),
+`purrr` (loops as functions), `forcats` (factors), `lubridate` (dates), and
+`tibble`. A **tibble** is the tidyverse's data frame: the same thing
+underneath, with better manners. It prints ten rows and the column types
+instead of flooding the console, never turns text into factors behind your
+back, and never guesses. Anything `readr` or `dplyr` hands you is a tibble;
+anything base R hands you is a plain data frame. Every function in this
+document accepts either, so the distinction only matters when you notice
+one printing differently from the other.
 
 ```{r}
 #| echo: true
@@ -247,9 +260,17 @@ counting starts at **1**, not 0.
 ## The pipe and the five verbs
 
 The pipe `|>` means "then". `x |> f(y)` is `f(x, y)`. It lets you write a
-data step as a sentence read top to bottom. You will also see `%>%`, the
-older pipe from the `magrittr` package; they are interchangeable for our
-purposes.
+data step as a sentence read top to bottom.
+
+**The pipe is not tidyverse.** This is the twist. `|>` is part of base R
+since version 4.1 (2021); it works with no package loaded, on any function.
+The tidyverse popularized the idea years earlier with `%>%` from the
+`magrittr` package, and `%>%` is what most code on the internet still
+shows. The two are interchangeable for everything in this workshop. Use
+`|>`: it is built in, it is what RStudio inserts with `Ctrl+Shift+M` once
+you tick the option under Tools, Global Options, Code, and it is where
+new code is going. The five verbs below are `dplyr`, which is tidyverse.
+The pipe that joins them is R.
 
 Five `dplyr` verbs do most of the work:
 
@@ -946,10 +967,18 @@ used. What lets you say "validated with these versions."
 **Chunk.** One fenced block of code. The unit of execution and of
 documentation.
 
-**Tibble.** A data frame with better manners: prints the first ten rows,
-shows column types, never converts strings to factors.
+**Tidyverse.** A family of R packages that share one style, loaded
+together with `library(tidyverse)`: `dplyr`, `tidyr`, `ggplot2`, `readr`,
+`stringr`, `purrr`, `forcats`, `lubridate`, `tibble`. Not R itself; a set of
+packages on top of it. Most of this workshop's code is tidyverse.
 
-**Pipe.** `|>`. "Then."
+**Tibble.** The tidyverse's data frame. Same thing as base R's
+`data.frame` underneath, with better manners: prints the first ten rows,
+shows column types, never converts strings to factors. From the `tibble`
+package, which `dplyr` and `readr` use for everything they return.
+
+**Pipe.** `|>`. "Then." Base R, since 4.1; not tidyverse. The older `%>%`
+is tidyverse (`magrittr`) and means the same thing.
 
 **Render.** Run the chunks, assemble the document, produce the output.
 "Knit" is the older R Markdown word for the same thing.
